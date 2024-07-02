@@ -1,8 +1,0 @@
-7/2/2024
-
-I think today we should do this:
-* download everything
-* bomb lab on binary ninja
-* read about decompilers
-
-- Micah
