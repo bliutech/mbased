@@ -11,7 +11,7 @@ class MBADeobfuscationInBackground(BackgroundTaskThread):
         self.bv = bv
 
     def run(self):
-	    for instr in self.bv.mlil_instructions:
+        for instr in self.bv.mlil_instructions:
             if instr.operation == MediumLevelILOperation.MLIL_IF:
                 log_info(instr)
 
@@ -20,4 +20,7 @@ def mba_deobfuscation_in_background(bv):
     background_task = MBADeobfuscationInBackground(bv, "Starting MBA Deobfuscation")
     background_task.start()
 
-PluginCommand.register("MBA Deobfuscation", "Simplifying booleans" , mba_deobfuscation_in_background)
+
+PluginCommand.register(
+    "MBA Deobfuscation", "Simplifying booleans", mba_deobfuscation_in_background
+)
