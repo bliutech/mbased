@@ -1,4 +1,4 @@
-=from binaryninja.log import log_info
+from binaryninja.log import log_info
 from binaryninja.binaryview import BinaryViewType
 from binaryninja.plugin import PluginCommand
 from binaryninja.plugin import BackgroundTaskThread
