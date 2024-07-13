@@ -17,3 +17,9 @@ Expr' ::= AND Expr
 
 term ::= [A-Z]+
 ```
+
+### First and Follow Function Table
+|       |     FIRST    | FOLLOW |
+|-------|:------------:|:------:|
+|  Expr | term, NOT, ( |  $, )  |
+| Expr' | AND, OR, ε   | $      |
