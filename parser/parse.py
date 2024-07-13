@@ -1,5 +1,7 @@
 class Parser:
     '''Parser object for syntax analyses'''
+
+    possible_tokens = [&. |, !, (, ), [A-Z]]
     
     def __init__(self):
         '''Initializes the parser object'''
