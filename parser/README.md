@@ -1,13 +1,16 @@
 ### LL(1) Parsing Table
 
-|       |        term       |       (       | ) |       NOT       |        AND       |        OR       |     $     |
+|       |        var       |       (       | ) |       NOT       |        AND       |        OR       |     $     |
 |-------|:-----------------:|:-------------:|:-:|:---------------:|:----------------:|:---------------:|:---------:|
-|  Expr | Expr → term Expr' | Expr → (Expr) |   | Expr → NOT Expr |                  |                 |           |
+|  Expr | Expr → var Expr' | Expr → (Expr) |   | Expr → NOT Expr |                  |                 |           |
 | Expr' |                   |               |   |                 | Expr' → AND Expr | Expr' → OR Expr | Expr' → ϵ |
+
+var = Variable \
+Expr = Expression
 
 ### Backus-Naur Form
 ```
-Expr ::= term Expr'
+Expr ::= var Expr'
        | NOT Expr
        | ( Expr )
 		
@@ -15,11 +18,11 @@ Expr' ::= AND Expr
         | OR Expr
         | ε
 
-term ::= [A-Z]+
+var ::= [A-Z]+
 ```
 
 ### First and Follow Function Table
 |       |     FIRST    | FOLLOW |
 |-------|:------------:|:------:|
-|  Expr | term, NOT, ( |  $, )  |
+|  Expr | var, NOT, ( |  $, )  |
 | Expr' | AND, OR, ε   | $      |
