@@ -1,16 +1,16 @@
 from typing import Union
 
 
-class Term:
+class Variable:
     """
-    Represents a single term in a binary expression
+    Represents a single variable term in a binary expression
 
     ...
 
     Attributes
     ----------
     name : str
-        the encoded name of the term
+        the encoded name of the variable term
     """
 
     def __init__(self, name: str) -> None:
@@ -18,7 +18,7 @@ class Term:
         Parameters
         ----------
         name : str
-            the encoded name of the term
+            the encoded name of the variable term
         """
         self.value = name
 
@@ -62,19 +62,19 @@ class Not:
         return "!"
 
 
-class Expr:
+class Expression:
     """
-    Represents a full binary expression
+    Represents a full boolean expression
 
     ...
 
     Attributes
     ----------
-    left : Expr/Term
-        The operand left of the expression's operator. Can be a Term or another Expr.
+    left : Variable/Expression
+        The operand left of the expression's operator. Can be a Variable or another Expression.
 
-    right : Expr/Term
-        The operand right of the expression's operator. Can be a Term or another Expr.
+    right : Variable/Expression
+        The operand right of the expression's operator. Can be a Variable or another Expression.
 
     operator : And/Or/Not
         The operator of the boolean expression.
@@ -82,18 +82,18 @@ class Expr:
 
     def __init__(
         self,
-        left: Union["Expr", "Term"],
-        right: Union["Expr", "Term"],
+        left: Union["Expression", "Variable"],
+        right: Union["Expression", "Variable"],
         operator: Union["And", "Or", "Not"],
     ) -> None:
         """
         Parameters
         ----------
-        left : Expr/Term
-            The operand left of the expression's operator. Can be a Term or another Expr.
+        left : Variable/Expression
+            The operand left of the expression's operator. Can be a Variable or another Expression.
 
-        right : Expr/Term
-            The operand right of the expression's operator. Can be a Term or another Expr.
+        right : Variable/Expression
+            The operand right of the expression's operator. Can be a Variable or another Expression.
 
         operator : And/Or/Not
             The operator of the boolean expression.
