@@ -8,13 +8,19 @@ class TestLexer(unittest.TestCase):
         l: Lexer = Lexer()
         l.lex(prog)
         self.assertEqual(
-            l.getTokens(), ["(", "A", "&", "B", ")", "|", "!", "C", "EOF"]
+            l.getTokens(), ["(", "A", "&", "B", ")", "|", "!", "C", "<EOF>"]
         )
 
         prog = "A|B"
-        l.lex(prog)
-        self.assertEqual(l.getTokens(), ["A", "|", "B", "EOF"])
+        l2: Lexer = Lexer()
+        l2.lex(prog)
+        self.assertEqual(l2.getTokens(), ["A", "|", "B", "<EOF>"])
 
         prog = "!(A & C)"
-        l.lex(prog)
-        self.assertEqual(l.getTokens(), ["!", "(", "A", "&", "C", ")", "EOF"])
+        l3: Lexer = Lexer()
+        l3.lex(prog)
+        self.assertEqual(l3.getTokens(), ["!", "(", "A", "&", "C", ")", "<EOF>"])
+
+
+t = TestLexer()
+t.test_lex()
