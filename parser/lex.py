@@ -1,6 +1,7 @@
 import re
 import sys
 
+
 class Lexer:
     terminals: str = r"\&|\||\!|\(|\)|[A-Z]+"
     ws: str = r"\s|\t|\n|\r"
@@ -35,3 +36,4 @@ class Lexer:
                     self.tokens.append(token)
 
             last = m.end()
+
