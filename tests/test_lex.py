@@ -3,7 +3,6 @@ from parser.lexer import Lexer
 
 
 class TestLexer(unittest.TestCase):
-
     def test_lex(self):
         prog: str = "(A & B) | !C"
         tokens: list[str] = Lexer.lex(prog)
