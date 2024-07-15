@@ -1,6 +1,6 @@
 ### LL(1) Parsing Table
 
-|       |        var       |       (       | ) |       NOT       |        AND       |        OR       |     $     |
+|       |        var       |       (       | ) |        !        |        &       |        \|       |     $     |
 |-------|:-----------------:|:-------------:|:-:|:---------------:|:----------------:|:---------------:|:---------:|
 |  Expr | Expr → var Expr' | Expr → (Expr) |   | Expr → NOT Expr |                  |                 |           |
 | Expr' |                   |               |   |                 | Expr' → AND Expr | Expr' → OR Expr | Expr' → ϵ |
@@ -24,5 +24,5 @@ var ::= [A-Z]+
 ### First and Follow Function Table
 |       |     FIRST    | FOLLOW |
 |-------|:------------:|:------:|
-|  Expr | var, NOT, ( |  $, )  |
-| Expr' | AND, OR, ε   | $      |
+|  Expr | var, !, ( |  $, )  |
+| Expr' | &, \|, ε   | $      |
