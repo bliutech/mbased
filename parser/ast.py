@@ -1,175 +1,158 @@
-type ExprType = (
-    "AndExpr" | "OrExpr" | "NotExpr" | "ParenExpr" | "Expr" | "ExprPrime"
-)  # Union of the different expression types for type hinting
+from __future__ import annotations
+from enum import Enum
 
-type VarType = "Var"
+
+class Operator(Enum):
+    """
+    An enumeration class to represent each operation in a boolean expression.
+
+    Attributes
+    ----------
+    value: str
+        the string value of each operator. The characters "&", "|", "!", "(", and ")" are allowed.
+    """
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+    And = "&"
+    Or = "|"
+    Not = "!"
+    ParenOpen = "("
+    ParenClose = ")"
 
 
 class Var:
     """
-    A class to represent a variable in an expression.
+    A class to represent the terminal value labeled by the encoder.
+
+    ...
 
     Attributes
     ----------
-    value : str
-        The name of the variable.
+    name : str
+        the name given to the boolean variable by the encoder. name ::= [A-Z]+
+
     """
 
     def __init__(self, name: str) -> None:
         """
+        Constructs all the necessary attributes for the Var object.
+
         Parameters
         ----------
         name : str
-            The name of the variable.
+            the name given to the boolean variable by the encoder. name ::= [A-Z]+
         """
-        self.value = name
+
+        self.name = name
 
     def __str__(self) -> str:
-        return self.value
+        return self.name
 
 
 class Expr:
     """
-    A class to represent a generic expression.
+    A class to represent a boolean expression. Can contain up to 3 terminals or non-terminals.
+
+    ...
 
     Attributes
     ----------
-    first : VarType or ExprType
-        The first part of the expression.
-    second : ExprType, optional
-        The second part of the expression (default is None).
+    first : Var | Operator
+        the first term of the expression. Can be a Var or Operator.
+
+    second: Expr | ExprPrime
+        the second term of the expression. Can be an Expr or ExprPrime.
+
+    third: Operator
+        the third term of the expression. Can only be the ParenClose Operator (default is None)
     """
 
-    def __init__(self, first: VarType | ExprType, second: ExprType = None) -> None:
+    def __init__(
+        self, first: Var | Operator, second: Expr | ExprPrime, third: Operator = None
+    ) -> None:
+        """
+        Constructs all the necessary attributes for the Expr object.
+
+        Parameters
+        ----------
+        first : Var | Operator
+            the first term of the expression. Can be a Var or Operator.
+
+        second: Expr | ExprPrime
+            the second term of the expression. Can be an Expr or ExprPrime.
+
+        third: Operator
+            the third term of the expression. Can only be the ParenClose Operator (default is None).
+        """
+        self.first = first
+        self.second = second
+        self.third = third
+
+    def __str__(self) -> str:
+        """
+        The string format of the Expr class.
+
+        Returns  in the format matching the number of terms of an expression.
+
+        Returns
+        -------
+        str
+        """
+
+        if self.first == Operator.Not:
+            return f"{self.first}{self.second}"
+
+        if self.first == Operator.ParenOpen:
+            return f"{self.first}{self.second}{self.third}"
+
+        return f"{self.first} {self.second}"
+
+
+class ExprPrime:
+    """
+    An intermediary class for Expr to maintain LL(1) grammar
+
+    Both attributes support None to allow for node to empty as per the LL(1) grammar.
+
+    ...
+
+    Attributes
+    ----------
+    first : Operator | None
+        the first term of the expression. Can be Operator or None (default is None).
+
+    second: Expr | None
+        the second term of the expression. Can be an Expr or None (default is None).
+    """
+
+    def __init__(self, first: Operator | None, second: Expr | None = None) -> None:
         """
         Parameters
         ----------
-        first : VarType or ExprType
-            The first part of the expression.
-        second : ExprType, optional
-            The second part of the expression (default is None).
+        first : Operator | None
+            the first term of the expression. Can be Operator or None (default is None).
+
+        second: Expr | None
+            the second term of the expression. Can be an Expr or None (default is None).
         """
         self.first = first
         self.second = second
 
     def __str__(self) -> str:
-        return (
-            str(self.first) + " " + str(self.second)
-            if self.second is not None
-            else str(self.first)
-        )
-
-
-class ExprPrime:
-    """
-    A class to represent expression' (needed for valid LL(1) grammar).
-
-    Attributes
-    ----------
-    first : ExprType or None
-        The first part of the expression.
-    """
-
-    def __init__(self, first: ExprType | None) -> None:
         """
-        Parameters
-        ----------
-        first : ExprType or None
-            The first part of the expression.
+        The string format of the Expr class.
+
+        Returns in the format matching the number of terms of an expression'.
+
+        Returns an empty string when both attributes are equal to None (ε/"").
+
+        Returns
+        -------
+        str
         """
-        self.first = first
+        if self.first is None:
+            return ""
 
-    def __str__(self) -> str:
-        return str(self.first)
-
-
-class AndExpr:
-    """
-    A class to represent an 'and' expression.
-
-    Attributes
-    ----------
-    first : VarType or ExprType
-        The first part of the expression.
-    """
-
-    def __init__(self, first: VarType | ExprType) -> None:
-        """
-        Parameters
-        ----------
-        first : VarType or ExprType
-            The first part of the expression.
-        """
-        self.first = first
-
-    def __str__(self) -> str:
-        return f"& {self.first}"
-
-
-class OrExpr:
-    """
-    A class to represent an 'or' expression.
-
-    Attributes
-    ----------
-    first : VarType or ExprType
-        The first part of the expression.
-    """
-
-    def __init__(self, first: VarType | ExprType) -> None:
-        """
-        Parameters
-        ----------
-        first : VarType or ExprType
-            The first part of the expression.
-        """
-        self.first = first
-
-    def __str__(self) -> str:
-        return f"| {self.first}"
-
-
-class NotExpr:
-    """
-    A class to represent a 'not' expression.
-
-    Attributes
-    ----------
-    first : VarType or ExprType
-        The first part of the expression.
-    """
-
-    def __init__(self, first: VarType | ExprType) -> None:
-        """
-        Parameters
-        ----------
-        first : VarType or ExprType
-            The first part of the expression.
-        """
-        self.first = first
-
-    def __str__(self) -> str:
-        return f"!{self.first}"
-
-
-class ParenExpr:
-    """
-    A class to represent a parenthesized expression.
-
-    Attributes
-    ----------
-    first : VarType or ExprType
-        The first part of the expression.
-    """
-
-    def __init__(self, first: VarType | ExprType) -> None:
-        """
-        Parameters
-        ----------
-        first : VarType or ExprType
-            The first part of the expression.
-        """
-        self.first = first
-
-    def __str__(self) -> str:
-        return f"({self.first})"
+        return f"{self.first} {self.second}"
