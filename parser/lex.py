@@ -17,7 +17,6 @@ class Lexer:
     def getTokens(self) -> list[str]:
         return self.tokens
 
-    @staticmethod
     def lex(self, prog: str):
         p: re.Pattern = re.compile(f"{Lexer.terminals}|{Lexer.ws}|{Lexer.eof}")
         last: int = 0
@@ -36,4 +35,3 @@ class Lexer:
                     self.tokens.append(token)
 
             last = m.end()
-
