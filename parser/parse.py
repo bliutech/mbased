@@ -25,6 +25,7 @@ class Parser:
         self.advance()  # Initializes the first token
         rv = self.expr()
         self.assert_end()
+	print("Successfully completed parsing")
         return rv
 
     def assert_end(self):
