@@ -3,7 +3,7 @@
 |       |        var       |       (       | ) |        !        |        &       |        \|       |     $     |
 |-------|:-----------------:|:-------------:|:-:|:---------------:|:----------------:|:---------------:|:---------:|
 |  Expr | Expr → var Expr' | Expr → (Expr) |   | Expr → NOT Expr |                  |                 |           |
-| Expr' |                   |               |   |                 | Expr' → AND Expr | Expr' → OR Expr | Expr' → ϵ |
+| Expr' |                   |               |   |                 | Expr' → & Expr | Expr' → \| Expr | Expr' → ϵ |
 
 var = Variable \
 Expr = Expression
@@ -11,11 +11,11 @@ Expr = Expression
 ### Backus-Naur Form
 ```
 Expr ::= var Expr'
-       | NOT Expr
+       | ! Expr
        | ( Expr )
 		
-Expr' ::= AND Expr
-        | OR Expr
+Expr' ::= & Expr
+        | \| Expr
         | ε
 
 var ::= [A-Z]+
