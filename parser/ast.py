@@ -1,16 +1,18 @@
-from typing import Union
+type ExprType = (
+    "AndExpr" | "OrExpr" | "NotExpr" | "ParenExpr" | "Expr" | "ExprPrime"
+)  # Union of the different expression types for type hinting
+
+type VarType = "Var"
 
 
-class Variable:
+class Var:
     """
-    Represents a single variable term in a binary expression
-
-    ...
+    A class to represent a variable in an expression.
 
     Attributes
     ----------
-    name : str
-        the encoded name of the variable term
+    value : str
+        The name of the variable.
     """
 
     def __init__(self, name: str) -> None:
@@ -18,7 +20,7 @@ class Variable:
         Parameters
         ----------
         name : str
-            the encoded name of the variable term
+            The name of the variable.
         """
         self.value = name
 
@@ -26,82 +28,148 @@ class Variable:
         return self.value
 
 
-class And:
+class Expr:
     """
-    Represents the AND (&) operator in a boolean expression
-    """
-
-    def __init__(self) -> None:
-        pass
-
-    def __str__(self) -> str:
-        return "&"
-
-
-class Or:
-    """
-    Represents the OR (|) operator in a boolean expression
-    """
-
-    def __init__(self) -> None:
-        pass
-
-    def __str__(self) -> str:
-        return "|"
-
-
-class Not:
-    """
-    Represents the NOT (!) operator in a boolean expression
-    """
-
-    def __init__(self) -> None:
-        pass
-
-    def __str__(self) -> str:
-        return "!"
-
-
-class Expression:
-    """
-    Represents a full boolean expression
-
-    ...
+    A class to represent a generic expression.
 
     Attributes
     ----------
-    left : Variable/Expression
-        The operand left of the expression's operator. Can be a Variable or another Expression.
-
-    right : Variable/Expression
-        The operand right of the expression's operator. Can be a Variable or another Expression.
-
-    operator : And/Or/Not
-        The operator of the boolean expression.
+    first : VarType or ExprType
+        The first part of the expression.
+    second : ExprType, optional
+        The second part of the expression (default is None).
     """
 
-    def __init__(
-        self,
-        left: Union["Expression", "Variable"],
-        right: Union["Expression", "Variable"],
-        operator: Union["And", "Or", "Not"],
-    ) -> None:
+    def __init__(self, first: VarType | ExprType, second: ExprType = None) -> None:
         """
         Parameters
         ----------
-        left : Variable/Expression
-            The operand left of the expression's operator. Can be a Variable or another Expression.
-
-        right : Variable/Expression
-            The operand right of the expression's operator. Can be a Variable or another Expression.
-
-        operator : And/Or/Not
-            The operator of the boolean expression.
+        first : VarType or ExprType
+            The first part of the expression.
+        second : ExprType, optional
+            The second part of the expression (default is None).
         """
-
-        self.left = left  # left operand
-        self.right = right  # right operand
-        self.operator = operator  # operator
+        self.first = first
+        self.second = second
 
     def __str__(self) -> str:
-        return f"{self.left} {self.operator} {self.right}"
+        return (
+            str(self.first) + " " + str(self.second)
+            if self.second is not None
+            else str(self.first)
+        )
+
+
+class ExprPrime:
+    """
+    A class to represent expression' (needed for valid LL(1) grammar).
+
+    Attributes
+    ----------
+    first : ExprType or None
+        The first part of the expression.
+    """
+
+    def __init__(self, first: ExprType | None) -> None:
+        """
+        Parameters
+        ----------
+        first : ExprType or None
+            The first part of the expression.
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return str(self.first)
+
+
+class AndExpr:
+    """
+    A class to represent an 'and' expression.
+
+    Attributes
+    ----------
+    first : VarType or ExprType
+        The first part of the expression.
+    """
+
+    def __init__(self, first: VarType | ExprType) -> None:
+        """
+        Parameters
+        ----------
+        first : VarType or ExprType
+            The first part of the expression.
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"& {self.first}"
+
+
+class OrExpr:
+    """
+    A class to represent an 'or' expression.
+
+    Attributes
+    ----------
+    first : VarType or ExprType
+        The first part of the expression.
+    """
+
+    def __init__(self, first: VarType | ExprType) -> None:
+        """
+        Parameters
+        ----------
+        first : VarType or ExprType
+            The first part of the expression.
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"| {self.first}"
+
+
+class NotExpr:
+    """
+    A class to represent a 'not' expression.
+
+    Attributes
+    ----------
+    first : VarType or ExprType
+        The first part of the expression.
+    """
+
+    def __init__(self, first: VarType | ExprType) -> None:
+        """
+        Parameters
+        ----------
+        first : VarType or ExprType
+            The first part of the expression.
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"!{self.first}"
+
+
+class ParenExpr:
+    """
+    A class to represent a parenthesized expression.
+
+    Attributes
+    ----------
+    first : VarType or ExprType
+        The first part of the expression.
+    """
+
+    def __init__(self, first: VarType | ExprType) -> None:
+        """
+        Parameters
+        ----------
+        first : VarType or ExprType
+            The first part of the expression.
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"({self.first})"
