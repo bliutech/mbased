@@ -35,7 +35,7 @@ class Var:
 
     """
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str):
         """
         Constructs all the necessary attributes for the Var object.
 
@@ -62,8 +62,8 @@ class Expr:
     first : Var | Operator
         the first term of the expression. Can be a Var or Operator.
 
-    second: Expr | ExprPrime
-        the second term of the expression. Can be an Expr or ExprPrime.
+    second: Expr | ExprPrime | None
+        the second term of the expression. Can be an Expr, ExprPrime, or None. Can only be None when ExprPrime is nullable.
 
     third: Operator
         the third term of the expression. Can only be the ParenClose Operator (default is None)
@@ -71,7 +71,7 @@ class Expr:
 
     def __init__(
         self, first: Var | Operator, second: Expr | ExprPrime, third: Operator = None
-    ) -> None:
+    ):
         """
         Constructs all the necessary attributes for the Expr object.
 
@@ -101,6 +101,9 @@ class Expr:
         str
         """
 
+        if self.second is None:
+            return str(self.first)  # when ExprPrime is nullable
+
         if self.first == Operator.Not:
             return f"{self.first}{self.second}"
 
@@ -120,22 +123,22 @@ class ExprPrime:
 
     Attributes
     ----------
-    first : Operator | None
-        the first term of the expression. Can be Operator or None (default is None).
+    first : Operator
+        the operator for the expression'.
 
-    second: Expr | None
-        the second term of the expression. Can be an Expr or None (default is None).
+    second: Expr
+        the expression that will have the operator applied to it.
     """
 
-    def __init__(self, first: Operator | None, second: Expr | None = None) -> None:
+    def __init__(self, first: Operator, second: Expr):
         """
         Parameters
         ----------
-        first : Operator | None
-            the first term of the expression. Can be Operator or None (default is None).
+        first : Operator
+            the operator for the expression'.
 
-        second: Expr | None
-            the second term of the expression. Can be an Expr or None (default is None).
+        second: Expr
+            the expression that will have the operator applied to it.
         """
         self.first = first
         self.second = second
