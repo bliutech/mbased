@@ -9,7 +9,7 @@
 Var = Variable \
 Expr = Expression
 
-### Backus-Naur Form
+### Extended Backus-Naur Form
 ```
 Expr ::= Var Expr'
        | ! Expr
@@ -23,8 +23,8 @@ Var ::= [A-Z]+
 ```
 
 ### First and Follow Function Table
-|       |     FIRST    | FOLLOW |
-|-------|:------------:|:------:|
-|  Expr |   [A-Z]+, !, (  |  $, )  |
-| Expr' |   &, \|, ε   |    $   |
-|  Var  |     [A-Z]+   | $, &, \||
+|       |     FIRST    | FOLLOW | NULLABLE |
+|-------|:------------:|:------:| -------- |
+|  Expr |   [A-Z]+, !, (  |  $, )  |       |
+| Expr' |     &, \|    |    $   |    Yes   |
+|  Var  |     [A-Z]+   | $, &, \||         |Z
