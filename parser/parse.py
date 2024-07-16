@@ -13,7 +13,6 @@ class Parser:
     def __init__(self):
         """Initializes the parser with attributes to be used"""
         self.pos: int = -1
-        self.current_token: str = None
         print("Initializing the parser")
 
     def parse(self, tokens: list[str]):
