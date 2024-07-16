@@ -1,6 +1,5 @@
 import re
 import sys
-from anytree import Node, RenderTree
 
 
 def error(msg: str, pos: int):
@@ -25,7 +24,7 @@ class Parser:
         self.advance()  # Initializes the first token
         rv = self.expr()
         self.assert_end()
-	print("Successfully completed parsing")
+        print("Successfully completed parsing")
         return rv
 
     def assert_end(self):
@@ -48,7 +47,7 @@ class Parser:
         """Moves to the next token"""
         if self.pos < self.len:
             self.pos += 1
-            self.next_token = self.tokens[self.pos]
+            self.next_token: str = self.tokens[self.pos]
 
     def expr(self):
         """Parses an expression"""
@@ -67,7 +66,7 @@ class Parser:
             else:
                 error(f"Expected ')' but found '{self.next_token}'", self.pos)
         else:
-            error(f"Expected [var, !, (] but found '{self.next_token}'")
+            error(f"Expected [var, !, (] but found '{self.next_token}'", self.pos)
 
     def expr_prime(self):
         """Parses an expression prime (explain what this is later)"""
@@ -87,7 +86,6 @@ class Parser:
         # print("var: " + str(self.next_token))
         if re.match("[A-Z]+", self.next_token):
             return True
-        return False
 
 
 """
@@ -103,7 +101,7 @@ var ::= [A-Z]+
 """
 
 # test
-p = Parser()
+p: Parser = Parser()
 tree = p.parse(
     ["!", "(", "A", "&", "!", "B", "|", "C", ")"]
 )  # tree does not tree, only parses
