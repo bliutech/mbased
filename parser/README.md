@@ -1,16 +1,17 @@
 ### LL(1) Parsing Table
 
-|       |        var       |       (       | ) |        !        |        &       |        \|       |     $     |
+|       |        [A-Z]      |       (       | ) |        !        |        &       |        \|       |     $     |
 |-------|:-----------------:|:-------------:|:-:|:---------------:|:----------------:|:---------------:|:---------:|
-|  Expr | Expr → var Expr' | Expr → (Expr) |   | Expr → NOT Expr |                  |                 |           |
-| Expr' |                   |               |   |                 | Expr' → & Expr | Expr' → \| Expr | Expr' → ϵ |
+|  Expr | Expr → Var Expr'  | Expr → (Expr) |   |  Expr → ! Expr  |                  |                 |           |
+| Expr' |                   |               |   |                 |  Expr' → & Expr  | Expr' → \| Expr | Expr' → ϵ |
+|   Var  |   Var → [A-Z]+    |               |   |                 |                  |                 |           |
 
-var = Variable \
+Var = Variable \
 Expr = Expression
 
 ### Backus-Naur Form
 ```
-Expr ::= var Expr'
+Expr ::= Var Expr'
        | ! Expr
        | ( Expr )
 		
@@ -18,11 +19,12 @@ Expr' ::= & Expr
         | \| Expr
         | ε
 
-var ::= [A-Z]+
+Var ::= [A-Z]+
 ```
 
 ### First and Follow Function Table
 |       |     FIRST    | FOLLOW |
 |-------|:------------:|:------:|
-|  Expr | var, !, ( |  $, )  |
-| Expr' | &, \|, ε   | $      |
+|  Expr |   [A-Z]+, !, (  |  $, )  |
+| Expr' |   &, \|, ε   |    $   |
+|  Var  |     [A-Z]+   | $, &, \||
