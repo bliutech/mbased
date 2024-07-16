@@ -24,7 +24,7 @@ Var ::= [A-Z]+
 
 ### First and Follow Function Table
 |       |     FIRST    | FOLLOW | NULLABLE |
-|-------|:------------:|:------:| -------- |
+|-------|:------------:|:------:| :-------: |
 |  Expr |   [A-Z]+, !, (  |  $, )  |       |
 | Expr' |     &, \|    |    $   |    Yes   |
 |  Var  |     [A-Z]+   | $, &, \||         |Z
