@@ -18,8 +18,6 @@ class Operator(Enum):
     And = "&"
     Or = "|"
     Not = "!"
-    ParenOpen = "("
-    ParenClose = ")"
 
 
 class Var:
@@ -64,9 +62,6 @@ class Expr:
 
     second: Expr | ExprPrime | None
         the second term of the expression. Can be an Expr, ExprPrime, or None. Can only be None when ExprPrime is nullable.
-
-    third: Operator
-        the third term of the expression. Can only be the ParenClose Operator (default is None)
     """
 
     def __init__(
@@ -82,13 +77,9 @@ class Expr:
 
         second: Expr | ExprPrime
             the second term of the expression. Can be an Expr or ExprPrime.
-
-        third: Operator
-            the third term of the expression. Can only be the ParenClose Operator (default is None).
         """
         self.first = first
         self.second = second
-        self.third = third
 
     def __str__(self) -> str:
         """
@@ -105,10 +96,7 @@ class Expr:
             return str(self.first)  # when ExprPrime is nullable
 
         if self.first == Operator.Not:
-            return f"{self.first}{self.second}"
-
-        if self.first == Operator.ParenOpen:
-            return f"{self.first}{self.second}{self.third}"
+            return str(self.first) + str(self.second)
 
         return f"{self.first} {self.second}"
 
@@ -159,3 +147,25 @@ class ExprPrime:
             return ""
 
         return f"{self.first} {self.second}"
+
+
+class ParenExpr:
+    """
+    A class to represent a parenthesized expression.
+    Attributes
+    ----------
+    first : Expr
+        The inner expression within the parentheses
+    """
+
+    def __init__(self, first: Expr):
+        """
+        Parameters
+        ----------
+        first : Expr
+            The inner expression within the parentheses
+        """
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"({self.first})"
