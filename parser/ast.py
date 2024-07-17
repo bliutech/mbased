@@ -1,5 +1,6 @@
-from __future__ import annotations
-from enum import Enum
+"""
+    Abstract Syntax Tree (AST) for boolean expressions.
+"""
 
 
 class Var:
@@ -33,13 +34,6 @@ class ExprPrime:
     """
 
     pass
-
-    # def __init__(self, first: ExprPrime = None):
-    #  self.first = first
-    # def __str__(self) -> str:
-    #  if self.first is None:
-    #      return "ε"
-    #  return str(self.first)
 
 
 class AndExpr(ExprPrime):
