@@ -1,8 +1,7 @@
 import string
 from dataclasses import dataclass
 import re
-from typing import Generator
-import unittest
+from typing import Iterator
 import itertools
 
 
@@ -47,7 +46,7 @@ class NameGenerator:
         Constructs all the necessary attributes for the NameGenerator object.
         """
         self.generated_dictionary_keys: dict[str, str] = {}
-        self.prev_state = []
+        self.prev_state: set[str] = set()
 
     def generate_name(self, conditional: str) -> str:
         """
@@ -64,7 +63,7 @@ class NameGenerator:
             The generated name.
         """
         replaced_conditional = re.sub("!=", "==", conditional)
-        if self.generated_dictionary_keys.get(replaced_conditional) == None:
+        if self.generated_dictionary_keys.get(replaced_conditional) is None:
             gen_key: str = next(self.generate_unique_uppercase_string())
             self.generated_dictionary_keys[replaced_conditional] = gen_key
             return gen_key
@@ -74,7 +73,7 @@ class NameGenerator:
             else:
                 return self.generated_dictionary_keys.get(replaced_conditional)
 
-    def generate_unique_uppercase_string(self) -> Generator[str, None, None]:
+    def generate_unique_uppercase_string(self) -> Iterator[str]:
         """
         Generates a unique uppercase string.
         }
@@ -87,7 +86,7 @@ class NameGenerator:
         for length in itertools.count(1):
             for s in itertools.product(string.ascii_uppercase, repeat=length):
                 if "".join(s) not in self.prev_state:
-                    self.prev_state.append("".join(s))
+                    self.prev_state.add("".join(s))
                     yield "".join(s)
 
 
@@ -127,14 +126,12 @@ class DictionaryEncoder:
             The encoded string.
         """
 
-        mlil_if_string.index
-
         first_index: int = mlil_if_string.index("(")
         last_index: int = len(mlil_if_string) - mlil_if_string[::-1].index(")")
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
+        LOGICAL_OPERATORS: str = r"(\|\||&&|!(?!\=)|\(|\))"
         split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
