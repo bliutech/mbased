@@ -1,0 +1,24 @@
+"""
+    MBA solver module applying strategies to simplify the AST.
+
+The Solver takes on the approach of applying passes to the AST in a
+pipeline fashion. A pass is a transformation that simplifies the AST
+in some way. The passes are defined in the passes directory.
+"""
+import sys
+from importlib import import_module
+
+
+class Solver:
+    def __init__(self, passes: list[str]):
+        self.passes: list[str] = passes
+
+    # TODO: Add type annotation for AST once classes are finished.
+    def run(self, ast):
+        for m in map(import_module, f"passes.{self.passes}"):
+            try:
+                ast = m.run_pass(ast)
+            except Exception as e:
+                print(f"Error in {m.__name__}: {e}", file=sys.stderr)
+                raise e
+        return ast
