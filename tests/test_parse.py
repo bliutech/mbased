@@ -1,7 +1,5 @@
-from parse import Parser
+from parser.parse import Parser
 
 p: Parser = Parser()
-tree = p.parse(
-    ["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"]
-)  
+tree = p.parse(["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"])
 print(tree)
