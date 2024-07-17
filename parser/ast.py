@@ -2,6 +2,8 @@
     Abstract Syntax Tree (AST) for boolean expressions.
 """
 
+from visitor import Visitor
+
 
 class Var:
     """
@@ -18,6 +20,9 @@ class Var:
 
     def __str__(self) -> str:
         return self.name
+
+    def accept(self, v: Visitor):
+        v.visitVar(self)
 
 
 class Expr:
@@ -52,6 +57,9 @@ class AndExpr(ExprPrime):
     def __str__(self) -> str:
         return f"& {self.first}"
 
+    def accept(self, v: Visitor):
+        v.visitAndExpr(self)
+
 
 class OrExpr(ExprPrime):
     """
@@ -68,6 +76,9 @@ class OrExpr(ExprPrime):
 
     def __str__(self) -> str:
         return f"| {self.first}"
+
+    def accept(self, v: Visitor):
+        v.visitOrExpr(self)
 
 
 class VarExpr(Expr):
@@ -93,6 +104,9 @@ class VarExpr(Expr):
 
         return f"{self.first} {self.second}"
 
+    def accept(self, v: Visitor):
+        v.visitVarExpr(self)
+
 
 class NotExpr(Expr):
     """
@@ -110,6 +124,9 @@ class NotExpr(Expr):
     def __str__(self) -> str:
         return f"!{self.first}"
 
+    def accept(self, v: Visitor):
+        v.visitNotExpr(self)
+
 
 class ParenExpr(Expr):
     """
@@ -126,3 +143,6 @@ class ParenExpr(Expr):
 
     def __str__(self) -> str:
         return f"({self.first})"
+
+    def accept(self, v: Visitor):
+        v.visitParenExpr(self)
