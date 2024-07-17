@@ -4,6 +4,7 @@
 
 from visitor import Visitor
 
+
 class Var:
     """
     A class to represent a variable from A-Z.
@@ -58,7 +59,7 @@ class AndExpr(ExprPrime):
 
     def accept(self, v: Visitor):
         v.visitAndExpr(self)
- 
+
 
 class OrExpr(ExprPrime):
     """
@@ -78,6 +79,7 @@ class OrExpr(ExprPrime):
 
     def accept(self, v: Visitor):
         v.visitOrExpr(self)
+
 
 class VarExpr(Expr):
     """
@@ -105,6 +107,7 @@ class VarExpr(Expr):
     def accept(self, v: Visitor):
         v.visitVarExpr(self)
 
+
 class NotExpr(Expr):
     """
     A class to represent a NOT expression.
@@ -124,6 +127,7 @@ class NotExpr(Expr):
     def accept(self, v: Visitor):
         v.visitNotExpr(self)
 
+
 class ParenExpr(Expr):
     """
     A class to represent a parenthesized expression.
@@ -140,7 +144,5 @@ class ParenExpr(Expr):
     def __str__(self) -> str:
         return f"({self.first})"
 
-
     def accept(self, v: Visitor):
         v.visitParenExpr(self)
-
