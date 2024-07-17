@@ -5,6 +5,7 @@ The Solver takes on the approach of applying passes to the AST in a
 pipeline fashion. A pass is a transformation that simplifies the AST
 in some way. The passes are defined in the passes directory.
 """
+
 import sys
 from importlib import import_module
 
