@@ -2,7 +2,11 @@
     Abstract Syntax Tree (AST) for boolean expressions.
 """
 
-from parser.visitor import Visitor
+from typing import TypeVar
+from parser.visitor import Visitor, ParamVisitor, RetVisitor, RetParamVisitor
+
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 class Var:
@@ -21,11 +25,28 @@ class Var:
     def __str__(self) -> str:
         return self.name
 
-    def accept(self, v: Visitor):
+    def accept(self, v: Visitor) -> None:
         v.visitVar(self)
 
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitVar(self, param)
 
-class Expr:
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitVar(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitVar(self, param)
+
+
+class Node:
+    """
+    An interface class to represent a node in the AST.
+    """
+
+    pass
+
+
+class Expr(Node):
     """
     An interface class to represent a full expression.
     """
@@ -33,7 +54,7 @@ class Expr:
     pass
 
 
-class ExprPrime:
+class ExprPrime(Node):
     """
     An interface class to represent a prime expression. Used to eliminate left-recursion.
     """
@@ -57,8 +78,17 @@ class AndExpr(ExprPrime):
     def __str__(self) -> str:
         return f"& {self.first}"
 
-    def accept(self, v: Visitor):
+    def accept(self, v: Visitor) -> None:
         v.visitAndExpr(self)
+
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitAndExpr(self, param)
+
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitAndExpr(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitAndExpr(self, param)
 
 
 class OrExpr(ExprPrime):
@@ -77,8 +107,17 @@ class OrExpr(ExprPrime):
     def __str__(self) -> str:
         return f"| {self.first}"
 
-    def accept(self, v: Visitor):
+    def accept(self, v: Visitor) -> None:
         v.visitOrExpr(self)
+
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitOrExpr(self, param)
+
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitOrExpr(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitOrExpr(self, param)
 
 
 class VarExpr(Expr):
@@ -104,8 +143,17 @@ class VarExpr(Expr):
 
         return f"{self.first} {self.second}"
 
-    def accept(self, v: Visitor):
+    def accept(self, v: Visitor) -> None:
         v.visitVarExpr(self)
+
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitVarExpr(self, param)
+
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitVarExpr(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitVarExpr(self, param)
 
 
 class NotExpr(Expr):
@@ -124,8 +172,17 @@ class NotExpr(Expr):
     def __str__(self) -> str:
         return f"!{self.first}"
 
-    def accept(self, v: Visitor):
+    def accept(self, v: Visitor) -> None:
         v.visitNotExpr(self)
+
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitNotExpr(self, param)
+
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitNotExpr(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitNotExpr(self, param)
 
 
 class ParenExpr(Expr):
@@ -146,3 +203,15 @@ class ParenExpr(Expr):
 
     def accept(self, v: Visitor):
         v.visitParenExpr(self)
+
+    def accept(self, v: Visitor) -> None:
+        v.visitParenExpr(self)
+
+    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+        v.visitParenExpr(self, param)
+
+    def acceptRet(self, v: RetVisitor) -> R:
+        return v.visitParenExpr(self)
+
+    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+        return v.visitParenExpr(self, param)

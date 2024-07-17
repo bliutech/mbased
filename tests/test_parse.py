@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from parser.ast import NotExpr, OrExpr, ParenExpr, VarExpr, AndExpr
 from parser.parse import Parser
-from parser.visitor import Visitor
+from parser.visitor import Visitor, RetParamVisitor
 
 
 class TestParse(TestCase):
@@ -81,3 +81,43 @@ class TestParse(TestCase):
                 "Var",
             ],
         )
+
+    def test_ret_visitor(self) -> None:
+        class CountVisitor(RetParamVisitor[int, int]):
+            def __init__(self):
+                self.visited: list[str] = []
+
+            @override
+            def visitVarExpr(self, vex: VarExpr, param: int) -> int:
+                tmp = vex.first.acceptParamRet(self, param) + 1
+                if vex.second:
+                    return vex.second.acceptParamRet(self, tmp)
+                else:
+                    return tmp
+
+            @override
+            def visitNotExpr(self, nex: NotExpr, param: int) -> int:
+                return nex.first.acceptParamRet(self, param) + 1
+
+            @override
+            def visitParenExpr(self, pex: ParenExpr, param: int) -> int:
+                return pex.first.acceptParamRet(self, param) + 1
+
+            @override
+            def visitAndExpr(self, aex: AndExpr, param: int) -> int:
+                return aex.first.acceptParamRet(self, param) + 1
+
+            @override
+            def visitOrExpr(self, oex: OrExpr, param: int) -> int:
+                return oex.first.acceptParamRet(self, param) + 1
+
+            @override
+            def visitVar(self, _, param: int) -> int:
+                return param + 1
+
+        p: Parser = Parser()
+        tree = p.parse(["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"])
+        visitor: CountVisitor = CountVisitor()
+        count = tree.acceptParamRet(visitor, 0)
+
+        self.assertEqual(count, 11)
