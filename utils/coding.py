@@ -2,6 +2,7 @@ import string
 from dataclasses import dataclass
 import re
 from typing import Generator
+import unittest
 import itertools
 
 
@@ -125,15 +126,11 @@ class DictionaryEncoder:
         str
             The encoded string.
         """
-        first_index: int = -1
-        last_index: int = -1
-        first_times: int = -1
-        for i in range(len(mlil_if_string)):
-            if mlil_if_string[i] == "(" and first_times < 0:
-                first_index = i
-                first_times += 1
-            elif mlil_if_string[i] == ")":
-                last_index = i + 1
+
+        mlil_if_string.index
+
+        first_index: int = mlil_if_string.index("(")
+        last_index: int = len(mlil_if_string) - mlil_if_string[::-1].index(")")
 
         condition: str = mlil_if_string[first_index:last_index]
 
