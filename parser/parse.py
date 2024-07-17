@@ -12,11 +12,10 @@ class Parser:
 
     def __init__(self) -> None:
         """Initializes the parser with attributes to be used"""
-        self.pos: int = 0
+        self.pos: int = -1
 
     def parse(self, tokens: list[str]) -> None:
         """Parses given tokens"""
-
         self.tokens: list[str] = tokens
         self.advance()  # Initializes the first token
         rv = self.expr()
@@ -39,11 +38,11 @@ class Parser:
         """Moves to the next token"""
         self.pos += 1
         self.next_token: str = self.tokens[self.pos]
-        
+
     def expr(self) -> None:
         """Parses an expression"""
-        if self.var():
-            self.eat(self.next_token)
+        if re.match("[A-Z]+", self.next_token):
+            self.var()
             self.expr_prime()
         elif self.next_token == "!":
             self.eat("!")
@@ -69,5 +68,4 @@ class Parser:
 
     def var(self) -> None:
         """Parses a variable that represents a boolean expression"""
-        if re.match("[A-Z]+", self.next_token):
-            return True
+        self.eat(self.next_token)
