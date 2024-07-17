@@ -11,3 +11,6 @@ class TestParse(TestCase):
             str(tree),
             "!(A & !B | C)",
         )
+
+        v: Visitor = Visitor()
+        tree.accept(v)

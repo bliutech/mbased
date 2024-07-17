@@ -20,5 +20,5 @@ class Visitor:
     def visitOrExpr(self, oex: "OrExpr") -> None:
         oex.first.accept(self)
 
-    def visitVar() -> None:
+    def visitVar(self, _) -> None:
         pass
