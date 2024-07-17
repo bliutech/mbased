@@ -10,15 +10,15 @@ def error(msg: str, pos: int):
 class Parser:
     """Parser object for analyzing tokens for errors"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the parser with attributes to be used"""
         self.pos: int = -1
         print("Initializing the parser")
 
-    def parse(self, tokens: list[str]):
+    def parse(self, tokens: list[str]) -> None:
         """Parses given tokens"""
 
-        self.tokens: str = tokens
+        self.tokens: list[str] = tokens
         self.len: int = len(tokens) - 1
         self.advance()  # Initializes the first token
         rv = self.expr()
@@ -26,15 +26,15 @@ class Parser:
         print("Successfully completed parsing")
         return rv
 
-    def assert_end(self):
-        if self.pos < self.len:
-            error(f"Expected end ({self.len})", self.pos)
+    def assert_end(self) -> None:
+        if self.next_token != "<EOF>":
+            error(f"Expected end '<EOF>' but found {self.next_token}", self.pos)
 
-    def next_token(self):
+    def next_token(self) -> None:
         next: str = self.tokens[self.pos + 1]
         return next
 
-    def eat(self, expected: str):
+    def eat(self, expected: str) -> None:
         """Skips a token"""
         if self.next_token == expected:
             # print("eating " + (self.next_token))
@@ -42,15 +42,16 @@ class Parser:
         else:
             error(f"Expected '{expected}' but found '{self.next_token}'", self.pos)
 
-    def advance(self):
+    def advance(self) -> None:
         """Moves to the next token"""
         if self.pos < self.len:
             self.pos += 1
             self.next_token: str = self.tokens[self.pos]
+            print(self.next_token)
 
-    def expr(self):
+    def expr(self) -> None:
         """Parses an expression"""
-        # print("expr: " + str(self.next_token))
+        print("expr: " + str(self.next_token))
         if self.var():
             self.eat(self.next_token)
             self.expr_prime()
@@ -67,9 +68,9 @@ class Parser:
         else:
             error(f"Expected [var, !, (] but found '{self.next_token}'", self.pos)
 
-    def expr_prime(self):
+    def expr_prime(self) -> None:
         """Parses an expression prime (explain what this is later)"""
-        # print("prime: " + self.next_token)
+        print("prime: " + self.next_token)
         if self.pos < self.len:
             if self.next_token == "&":
                 self.eat("&")
@@ -77,14 +78,14 @@ class Parser:
             elif self.next_token == "|":
                 self.eat("|")
                 self.expr()
-            else:
-                self.advance()
 
-    def var(self):
+    def var(self) -> None:
         """Parses a variable that represents a boolean expression"""
-        # print("var: " + str(self.next_token))
+        print("var: " + str(self.next_token))
         if re.match("[A-Z]+", self.next_token):
             return True
+        else:
+            print("not var: " + self.next_token)
 
 
 """
@@ -102,6 +103,6 @@ var ::= [A-Z]+
 # test
 p: Parser = Parser()
 tree = p.parse(
-    ["!", "(", "A", "&", "!", "B", "|", "C", ")"]
+    ["!", "A", "&", "!", "B", "|", "C", "<EOF>"]
 )  # tree does not tree, only parses
 print(tree)
