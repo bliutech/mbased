@@ -3,20 +3,27 @@ from parser import ast
 
 class Visitor:
 
-    def traverseAST():
-        
+    def visitNotExpr(self, vex: VarExpr):
+        vex.accept(self)
 
-    def visitOperator():
-        pass
+    def visitVarExpr(self, exp: ExprPrime, va: Var):
+        exp.accept(self)
+        va.accept(self)
 
     def visitVar():
-        pass
-
-    def visitExpr():
-        pass
+        return
 
     def visitExprPrime():
-        pass
+        return
 
-    def visitParenExpr():
-        pass
+    def visitExpr():
+        return
+
+    def visitAndExpr(self, aex: AndExpr):
+        return
+
+    def visitOrExpr(self, oex: OrExpr):
+        return
+
+    def visitParenExpr(self, pex: ParenExpr):
+        return
