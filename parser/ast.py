@@ -2,7 +2,7 @@
     Abstract Syntax Tree (AST) for boolean expressions.
 """
 
-from visitor import Visitor
+from parser.visitor import Visitor
 
 
 class Var:

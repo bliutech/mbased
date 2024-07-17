@@ -1,9 +1,9 @@
 import unittest
-from parser.lexer import Lexer
+from parser.lex import Lexer
 
 
 class TestLexer(unittest.TestCase):
-    def test_lex(self):
+    def test_lex(self) -> None:
         prog: str = "(A & B) | !C"
         l: Lexer = Lexer()
         l.lex(prog)

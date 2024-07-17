@@ -17,7 +17,7 @@ class Lexer:
     def getTokens(self) -> list[str]:
         return self.tokens
 
-    def lex(self, prog: str):
+    def lex(self, prog: str) -> None:
         p: re.Pattern = re.compile(f"{Lexer.terminals}|{Lexer.ws}|{Lexer.eof}")
         last: int = 0
         for m in p.finditer(prog):
