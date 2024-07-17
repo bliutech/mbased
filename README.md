@@ -8,7 +8,11 @@ To contribute to this project, please open a pull request with your changes. If 
 python -m black *.py */*.py
 ```
 
-Formatting is checked using a GitHub action, so please ensure that your code is formatted before opening a pull request.
+Formatting is checked using a GitHub action, so please ensure that your code is formatted before opening a pull request. We also try and follow good practices by adding type hints to our code. Please ensure that you add type hints to your code. A good tool to check for type hints is `mypy`. To install `mypy`, run `pip install mypy`. To see how to use `mypy`, run the following command.
+
+```
+python -m mypy -h
+```
 
 ## Authors
 - Project Members: Micah, Tim, Sanjana, Nitin
