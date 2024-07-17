@@ -7,10 +7,11 @@ class Lexer:
     ws: str = r"\s|\t|\n|\r"
     eof: str = r"\Z"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.tokens: list[str] = []
 
-    def error(msg: str):
+    @staticmethod
+    def error(msg: str) -> None:
         print(f"Lex error: {msg}", file=sys.stderr)
         exit(1)
 
@@ -18,7 +19,7 @@ class Lexer:
         return self.tokens
 
     def lex(self, prog: str) -> None:
-        p: re.Pattern = re.compile(f"{Lexer.terminals}|{Lexer.ws}|{Lexer.eof}")
+        p: re.Pattern[str] = re.compile(f"{Lexer.terminals}|{Lexer.ws}|{Lexer.eof}")
         last: int = 0
         for m in p.finditer(prog):
             token: str = m.group()

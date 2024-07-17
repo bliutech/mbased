@@ -62,16 +62,17 @@ class NameGenerator:
         str
             The generated name.
         """
-        replaced_conditional = re.sub("!=", "==", conditional)
-        if self.generated_dictionary_keys.get(replaced_conditional) is None:
+        replaced_conditional: str = re.sub("!=", "==", conditional)
+        val: str | None = self.generated_dictionary_keys.get(replaced_conditional)
+        if val is None:
             gen_key: str = next(self.generate_unique_uppercase_string())
             self.generated_dictionary_keys[replaced_conditional] = gen_key
             return gen_key
         else:
             if conditional != replaced_conditional:
-                return "! " + self.generated_dictionary_keys.get(replaced_conditional)
+                return "! " + val
             else:
-                return self.generated_dictionary_keys.get(replaced_conditional)
+                return val
 
     def generate_unique_uppercase_string(self) -> Iterator[str]:
         """
@@ -109,7 +110,7 @@ class DictionaryEncoder:
         """
         Constructs all the necessary attributes for the DictionaryEncoder object.
         """
-        self.name_generator = NameGenerator()
+        self.name_generator: NameGenerator = NameGenerator()
 
     def encode(self, mlil_if_string: str) -> str:
         """

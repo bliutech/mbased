@@ -20,7 +20,3 @@ class TestLexer(unittest.TestCase):
         l3: Lexer = Lexer()
         l3.lex(prog)
         self.assertEqual(l3.getTokens(), ["!", "(", "A", "&", "C", ")", "<EOF>"])
-
-
-t = TestLexer()
-t.test_lex()

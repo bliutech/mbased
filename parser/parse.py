@@ -21,6 +21,7 @@ class Parser:
         """Initializes the parser with attributes to be used"""
         self.pos: int = -1
 
+    @staticmethod
     def error(msg: str, pos: int):
         print(f"Parse error: {msg} at position {pos}", file=sys.stderr)
         exit(1)
