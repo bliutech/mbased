@@ -1,67 +1,130 @@
 import string
 from dataclasses import dataclass
 import re
-import unittest
+from typing import Generator
 import itertools
-
-
-class NameGenerator:
-    def __init__(self) -> None:
-        self.generated_list: dict[str, str] = {"conditional": "key"}
-        self.last_state = []
-
-    def is_same_except_not_equal(self, cond: str) -> bool | str:
-        for i in range(1, len(self.generated_list)):
-            compare: list[str] = list(self.generated_list.keys())[i]
-            parts1: list[str] = cond.split()
-            parts2: list[str] = compare.split()
-            if len(parts1) != len(parts2):
-                return False
-
-            differences: int = 0
-            for p1, p2 in zip(parts1, parts2):
-                if p1 != p2:
-                    if (p1 == "==" and p2 == "!=") or (p1 == "!=" and p2 == "=="):
-                        differences += 1
-                    else:
-                        differences += 2
-
-            if differences == 1:
-                return compare
-        return False
-
-    def generate_name(self, conditional: str) -> str:
-        reused_test: bool | str = self.is_same_except_not_equal(conditional)
-        if (self.generated_list.get(conditional) == None) and type(reused_test) == bool:
-            gen_key: str = next(self.generate_unique_uppercase_string())
-            new_code: dict[str, str] = {conditional: gen_key}
-            self.generated_list.update(new_code)
-            return gen_key
-        else:
-            if type(reused_test) != bool:
-                return "! " + self.generated_list.get(reused_test)
-            else:
-                return self.generated_list.get(conditional)
-
-    def generate_unique_uppercase_string(self) -> any:
-        for length in itertools.count(1):
-            for s in itertools.product(string.ascii_uppercase, repeat=length):
-                if "".join(s) not in self.last_state:
-                    self.last_state.append("".join(s))
-                    yield "".join(s)
 
 
 @dataclass
 class Boolean:
+    """
+    A class to represent a boolean expression with raw and encoded forms.
+
+    Attributes
+    ----------
+    raw : str
+        The raw boolean expression.
+    encoded : str
+        The encoded boolean expression.
+    """
+
     raw: str
     encoded: str
 
 
-class DictionaryEncoder:
+class NameGenerator:
+    """
+    A class to generate unique names for boolean conditions.
+
+    Attributes
+    ----------
+    generated_dictionary_keys : dict
+        A dictionary to store generated names for conditions.
+    last_state : list
+        A list to store the last state of generated names.
+
+    Methods
+    -------
+    generate_name(conditional: str) -> str:
+        Generates a unique name for a given condition.
+    generate_unique_uppercase_string() -> any:
+        Generates a unique uppercase string.
+    """
+
     def __init__(self) -> None:
+        """
+        Constructs all the necessary attributes for the NameGenerator object.
+        """
+        self.generated_dictionary_keys: dict[str, str] = {}
+        self.prev_state = []
+
+    def generate_name(self, conditional: str) -> str:
+        """
+        Generates a unique name for a given condition.
+
+        Parameters
+        ----------
+        conditional : str
+            The condition to generate a name for.
+
+        Returns
+        -------
+        str
+            The generated name.
+        """
+        replaced_conditional = re.sub("!=", "==", conditional)
+        if self.generated_dictionary_keys.get(replaced_conditional) == None:
+            gen_key: str = next(self.generate_unique_uppercase_string())
+            self.generated_dictionary_keys[replaced_conditional] = gen_key
+            return gen_key
+        else:
+            if conditional != replaced_conditional:
+                return "! " + self.generated_dictionary_keys.get(replaced_conditional)
+            else:
+                return self.generated_dictionary_keys.get(replaced_conditional)
+
+    def generate_unique_uppercase_string(self) -> Generator[str, None, None]:
+        """
+        Generates a unique uppercase string.
+        }
+
+        Yields
+        ------
+        str
+            A unique uppercase string.
+        """
+        for length in itertools.count(1):
+            for s in itertools.product(string.ascii_uppercase, repeat=length):
+                if "".join(s) not in self.prev_state:
+                    self.prev_state.append("".join(s))
+                    yield "".join(s)
+
+
+class DictionaryEncoder:
+    """
+    A class to encode boolean expressions using generated names.
+
+    Attributes
+    ----------
+    name_generator : NameGenerator
+        An instance of the NameGenerator class.
+
+    Methods
+    -------
+    encode(mlil_if_string: str) -> str:
+        Encodes a given MLIL if-string.
+    """
+
+    def __init__(self) -> None:
+        """
+        Constructs all the necessary attributes for the DictionaryEncoder object.
+        """
         self.name_generator = NameGenerator()
 
-    def encode(self, mlil_if_string) -> str:
+    def encode(self, mlil_if_string: str) -> str:
+        """
+        Encodes a given MLIL if-string.
+
+        Parameters
+        ----------
+        mlil_if_string : str
+            The MLIL if-string to encode.
+
+        Returns
+        -------
+        str
+            The encoded string.
+        """
         first_index: int = -1
         last_index: int = -1
         first_times: int = -1
@@ -74,8 +137,8 @@ class DictionaryEncoder:
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        logical_operators = r"(\|\||&&|!(?!\=)|\(|\))"
-        split_conditions: list[str] = re.split(logical_operators, condition)
+        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
+        split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
         encoded_parts: list[str] = []
@@ -93,22 +156,3 @@ class DictionaryEncoder:
                 encoded_parts.append(code)
 
         return " ".join(encoded_parts)
-
-
-# Unit tests
-class TestNameGenerator(unittest.TestCase):
-    def test_generate_name(self) -> None:
-        name_gen: NameGenerator = NameGenerator()
-
-
-class TestDictionaryEncoder(unittest.TestCase):
-    def test_encode(self) -> None:
-        encoder: DictionaryEncoder = DictionaryEncoder()
-        encoded_str: str = encoder.encode(
-            "if (([ebp_1 + 0x14].b == 0 || [ebp_1 + 0x14].b != 0 && [ebp_1 + 0x14].c != 0) || (![ebp_1 + 0x14] == 0) then 387 @ 0x8040da8 else 388 @ 0x8040d8b"
-        )
-        print(encoded_str)
-
-
-if __name__ == "__main__":
-    unittest.main()
