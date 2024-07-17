@@ -1,20 +1,3 @@
-class TestNameGenerator(unittest.TestCase):
-    """
-    A class to test the NameGenerator class.
-
-    Methods
-    -------
-    test_generate_name() -> None:
-        Tests the generate_name method.
-    """
-
-    def test_generate_name(self) -> None:
-        """
-        Tests the generate_name method.
-        """
-        name_gen: NameGenerator = NameGenerator()
-
-
 class TestDictionaryEncoder(unittest.TestCase):
     """
     A class to test the DictionaryEncoder class.
@@ -42,5 +25,3 @@ class TestDictionaryEncoder(unittest.TestCase):
             self.assertEqual(
                 encoded_str, answer, "Two values are not equal to each other..."
             )
-
-
