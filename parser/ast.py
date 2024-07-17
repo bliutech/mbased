@@ -201,9 +201,6 @@ class ParenExpr(Expr):
     def __str__(self) -> str:
         return f"({self.first})"
 
-    def accept(self, v: Visitor):
-        v.visitParenExpr(self)
-
     def accept(self, v: Visitor) -> None:
         v.visitParenExpr(self)
 
