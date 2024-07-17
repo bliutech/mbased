@@ -50,10 +50,7 @@ class Parser:
         elif self.next_token == "(":
             self.eat("(")
             self.expr()
-            if self.next_token == ")":
-                self.eat(")")
-            else:
-                error(f"Expected ')' but found '{self.next_token}'", self.pos)
+            self.eat(")")
         else:
             error(f"Expected [var, !, (] but found '{self.next_token}'", self.pos)
 
@@ -69,3 +66,8 @@ class Parser:
     def var(self) -> None:
         """Parses a variable that represents a boolean expression"""
         self.eat(self.next_token)
+
+
+p: Parser = Parser()
+tree = p.parse(["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"])
+print(tree)
