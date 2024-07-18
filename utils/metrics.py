@@ -3,10 +3,9 @@ from typing import override
 from parser.ast import VarExpr, NotExpr, ParenExpr, AndExpr, OrExpr
 from parser.visitor import Visitor
 
-
 class OpCounter(Visitor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._count = 0
 
     @override
@@ -33,5 +32,5 @@ class OpCounter(Visitor):
     def visitVar(self, _) -> None:
         OpCounter._count += 1
 
-    def get_count(self):
+    def getCount(self) -> None:
         return self._count
