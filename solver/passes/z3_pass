@@ -71,13 +71,13 @@ class TranslateToZ3(RetVisitor[z3.ExprRef]):
     def visitVar(self, va: Var) -> z3.ExprRef:
         return self.symbols[va.name]
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
 
-        prog: str = "A | B & C"
-        l: Lexer = Lexer()
-        l.lex(prog)
+    prog: str = "A | B & C"
+    l: Lexer = Lexer()
+    l.lex(prog)
 
-        p: Parser = Parser()
-        ast: Expr = p.parse(l.tokens)
+    p: Parser = Parser()
+    ast: Expr = p.parse(l.tokens)
 
-        run_pass(ast)
+    run_pass(ast)
