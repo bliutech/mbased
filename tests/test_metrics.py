@@ -1,6 +1,6 @@
-from typing import override
 from unittest import TestCase
 
+from parser.ast import Expr
 from parser.parse import Parser
 from utils.metrics import OpCounter
 
@@ -8,9 +8,8 @@ from utils.metrics import OpCounter
 class TestCount(TestCase):
     def test_counter(self) -> None:
         p: Parser = Parser()
-        tree = p.parse(["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"])
-        counter = OpCounter()
-
+        tree: Expr = p.parse(["!", "(", "A", "&", "!", "B", "|", "C", ")", "<EOF>"])
+        counter: OpCounter = OpCounter()
         self.assertEqual(counter.getCount(), 0)
 
         tree.accept(counter)
