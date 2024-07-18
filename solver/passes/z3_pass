@@ -1,0 +1,83 @@
+from typing import override
+from parser.ast import Expr
+from parser.ast import AndExpr, OrExpr, Expr, NotExpr, ParenExpr, Var, VarExpr
+from parser.visitor import Visitor, RetVisitor
+import z3
+
+from parser.lex import Lexer
+from parser.parse import Parser
+
+
+def run_pass(ast: Expr) -> Expr:
+    v: Z3MappingVisitor = Z3MappingVisitor()
+    ast.accept(v)
+
+    t: TranslateToZ3 = TranslateToZ3(v.symbols)
+    p: z3.ExprRef = ast.acceptRet(t)
+    simplifiedExpr = z3.simplify(p)
+    simplifiedStr: str = str(simplifiedExpr)
+
+    l: Lexer = Lexer()
+    l.lex(simplifiedStr)
+
+    pa: Parser = Parser()
+    ast = pa.parse(l.tokens)
+
+    return ast
+
+
+class Z3MappingVisitor(Visitor):
+    def __init__(self):
+        self.symbols: dict[str, z3.Bool] = {}
+
+    @override
+    def visitVar(self, va: Var):
+        self.symbols[va.name] = z3.Bool(va.name)
+
+
+class TranslateToZ3(RetVisitor[z3.ExprRef]):
+
+    def __init__(self, symbols: dict[str, z3.Bool]):
+        self.symbols = symbols
+
+    @override
+    def visitVarExpr(self, vex: VarExpr) -> z3.ExprRef:
+        first: z3.ExprRef = vex.first.acceptRet(self)
+        if vex.second:
+            second: z3.ExprRef = vex.second.acceptRet(self)
+            if isinstance(vex.second, AndExpr):
+                return z3.And(first, second)
+            elif isinstance(vex.second, OrExpr):
+                return z3.Or(first, second)
+        return first
+
+    @override
+    def visitNotExpr(self, nex: NotExpr) -> z3.ExprRef:
+        return z3.Not(nex.expr.acceptRet(self))
+
+    @override
+    def visitParenExpr(self, pex: ParenExpr) -> z3.ExprRef:
+        return pex.expr.acceptRet(self)
+
+    @override
+    def visitAndExpr(self, aex: AndExpr) -> z3.ExprRef:
+        return z3.And(aex.first.acceptRet(self))
+
+    @override
+    def visitOrExpr(self, oex: OrExpr) -> z3.ExprRef:
+        return z3.Or(oex.first.acceptRet(self))
+
+    @override
+    def visitVar(self, va: Var) -> z3.ExprRef:
+        return self.symbols[va.name]
+
+    if __name__ == "__main__":
+
+        prog: str = "A | B & C"
+        l: Lexer = Lexer()
+        l.lex(prog)
+
+        p: Parser = Parser()
+        ast: Expr = p.parse(l.tokens)
+
+        run_pass(ast)
