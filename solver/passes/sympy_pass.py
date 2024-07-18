@@ -64,7 +64,7 @@ class TranslateToSympy(RetVisitor):
         return Not(nex.first.acceptRet(self))
 
     def visitParenExpr(self, pex: "ParenExpr") -> R:
-        pass
+        return pex.first.acceptRet(self)
 
     def visitAndExpr(self, aex: "AndExpr", leftOperand: "Expr") -> R:
         return And(leftOperand.acceptRet(self), aex.first.acceptRet(self))
