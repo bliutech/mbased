@@ -146,7 +146,7 @@ class DictionaryEncoder:
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
+        LOGICAL_OPERATORS: str = r"(\|\||&&|!(?!\=)|\(|\))"
         split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
@@ -213,16 +213,13 @@ class DictionaryDecoder:
                     decoded_parts.append(tokens[i])
             elif tokens[i] == "!":
                 i += 1
-                replace_not_equals: str = list(self.mapping.keys())[
-                    list(self.mapping.values()).index(tokens[i])
+                replace_not_equals: str = self.mappings[tokens[i]]
                 ]
                 replace_not_equals = re.sub("==", "!=", replace_not_equals)
                 decoded_parts.append(replace_not_equals)
             else:
                 decoded_parts.append(
-                    list(self.mapping.keys())[
-                        list(self.mapping.values()).index(tokens[i])
-                    ]
+                    self.mappings[tokens[i]]
                 )
             i += 1
 
