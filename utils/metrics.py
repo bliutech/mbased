@@ -6,7 +6,7 @@ from parser.visitor import Visitor
 class OpCounter(Visitor):
 
     def __init__(self) -> None:
-        self._count = 0
+        self._count: int = 0
 
     @override
     def visitVarExpr(self, vex: VarExpr) -> None:
