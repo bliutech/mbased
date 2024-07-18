@@ -1,7 +1,8 @@
 import string
 from dataclasses import dataclass
 import re
-from typing import Iterator
+from typing import Generator
+import unittest
 import itertools
 
 
@@ -46,7 +47,7 @@ class NameGenerator:
         Constructs all the necessary attributes for the NameGenerator object.
         """
         self.generated_dictionary_keys: dict[str, str] = {}
-        self.prev_state: set[str] = set()
+        self.prev_state = []
 
     def generate_name(self, conditional: str) -> str:
         """
@@ -62,19 +63,20 @@ class NameGenerator:
         str
             The generated name.
         """
-        replaced_conditional: str = re.sub("!=", "==", conditional)
-        val: str | None = self.generated_dictionary_keys.get(replaced_conditional)
-        if val is None:
+        replaced_conditional = re.sub("!=", "==", conditional)
+        if self.generated_dictionary_keys.get(replaced_conditional) == None:
             gen_key: str = next(self.generate_unique_uppercase_string())
             self.generated_dictionary_keys[replaced_conditional] = gen_key
+            if conditional != replaced_conditional:
+                return "! " + gen_key
             return gen_key
         else:
             if conditional != replaced_conditional:
-                return "! " + val
+                return "! " + self.generated_dictionary_keys.get(replaced_conditional)
             else:
-                return val
+                return self.generated_dictionary_keys.get(replaced_conditional)
 
-    def generate_unique_uppercase_string(self) -> Iterator[str]:
+    def generate_unique_uppercase_string(self) -> Generator[str, None, None]:
         """
         Generates a unique uppercase string.
         }
@@ -87,8 +89,11 @@ class NameGenerator:
         for length in itertools.count(1):
             for s in itertools.product(string.ascii_uppercase, repeat=length):
                 if "".join(s) not in self.prev_state:
-                    self.prev_state.add("".join(s))
+                    self.prev_state.append("".join(s))
                     yield "".join(s)
+
+    def return_encoded_value(self) -> dict[str, str]:
+        return self.generated_dictionary_keys
 
 
 class DictionaryEncoder:
@@ -110,7 +115,7 @@ class DictionaryEncoder:
         """
         Constructs all the necessary attributes for the DictionaryEncoder object.
         """
-        self.name_generator: NameGenerator = NameGenerator()
+        self.name_generator = NameGenerator()
 
     def encode(self, mlil_if_string: str) -> str:
         """
@@ -127,12 +132,21 @@ class DictionaryEncoder:
             The encoded string.
         """
 
+        mlil_if_string.index
+
         first_index: int = mlil_if_string.index("(")
         last_index: int = len(mlil_if_string) - mlil_if_string[::-1].index(")")
+        """first_times: int = -1
+        for i in range(len(mlil_if_string)):
+            if mlil_if_string[i] == "(" and first_times < 0:
+                first_index = i
+                first_times += 1
+            elif mlil_if_string[i] == ")":
+                last_index = i + 1"""
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        LOGICAL_OPERATORS: str = r"(\|\||&&|!(?!\=)|\(|\))"
+        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
         split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
@@ -151,3 +165,65 @@ class DictionaryEncoder:
                 encoded_parts.append(code)
 
         return " ".join(encoded_parts)
+
+    def get_encoded_dictionary(self) -> dict[str, str]:
+        return self.name_generator.return_encoded_value()
+
+
+class DictionaryDecoder:
+    def __init__(self, generated_dictionary_keys):
+        """
+        Initialize the DictionaryDecoder with a given mapping.
+
+        Parameters
+        ----------
+        mapping : dict
+            A dictionary mapping encoded values to their original MLIL values.
+        """
+        self.mapping: dict[str, str] = generated_dictionary_keys
+
+    def decode(self, encoded_str):
+        """
+        Decode an encoded boolean statement back to the original values.
+
+        Parameters
+        ----------
+        encoded_str : str
+            The encoded string.
+
+        Returns
+        -------
+        str
+            The decoded string.
+        """
+
+        LOGICAL_OPERATORS_DECODER: re.Pattern = r"(\w+|\|\||&&|[!()&|])"
+        tokens: list[str] = re.split(LOGICAL_OPERATORS_DECODER, encoded_str)
+        tokens = [cond.strip() for cond in tokens if cond.strip()]
+        decoded_parts: list[str] = []
+
+        i: int = 0
+        while i < len(tokens):
+            if tokens[i] in {"|", "&", "(", ")"}:
+                if tokens[i] == "|":
+                    decoded_parts.append("||")
+                elif tokens[i] == "&":
+                    decoded_parts.append("&&")
+                else:
+                    decoded_parts.append(tokens[i])
+            elif tokens[i] == "!":
+                i += 1
+                replace_not_equals: str = list(self.mapping.keys())[
+                    list(self.mapping.values()).index(tokens[i])
+                ]
+                replace_not_equals = re.sub("==", "!=", replace_not_equals)
+                decoded_parts.append(replace_not_equals)
+            else:
+                decoded_parts.append(
+                    list(self.mapping.keys())[
+                        list(self.mapping.values()).index(tokens[i])
+                    ]
+                )
+            i += 1
+
+        return " ".join(decoded_parts)
