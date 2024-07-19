@@ -14,20 +14,20 @@ def run_pass(ast: Expr) -> Expr:
 
     t: TranslateToZ3 = TranslateToZ3(v.symbols)
     p: z3.ExprRef = ast.acceptRet(t)
-    simplifiedExpr = z3.simplify(p)
+    simplifiedExpr: z3.ExprRef = z3.simplify(p)
     simplifiedStr: str = str(simplifiedExpr)
 
     l: Lexer = Lexer()
     l.lex(simplifiedStr)
 
     pa: Parser = Parser()
-    ast = pa.parse(l.tokens)
+    ast: Expr = pa.parse(l.tokens)
 
     return ast
 
 
 class Z3MappingVisitor(Visitor):
-    def __init__(self):
+    def __init__(self) -> None:
         self.symbols: dict[str, z3.Bool] = {}
 
     @override
@@ -37,14 +37,14 @@ class Z3MappingVisitor(Visitor):
 
 class TranslateToZ3(RetVisitor[z3.ExprRef]):
 
-    def __init__(self, symbols: dict[str, z3.Bool]):
+    def __init__(self, symbols: dict[str, z3.Bool]) -> None:
         self.symbols = symbols
 
     @override
     def visitVarExpr(self, vex: VarExpr) -> z3.ExprRef:
         first: z3.ExprRef = vex.first.acceptRet(self)
         if vex.second:
-            second: z3.ExprRef = vex.second.acceptRet(self)
+            second: z3.ExprRef = vex.second.first.acceptRet(self)
             if isinstance(vex.second, AndExpr):
                 return z3.And(first, second)
             elif isinstance(vex.second, OrExpr):
@@ -53,23 +53,24 @@ class TranslateToZ3(RetVisitor[z3.ExprRef]):
 
     @override
     def visitNotExpr(self, nex: NotExpr) -> z3.ExprRef:
-        return z3.Not(nex.expr.acceptRet(self))
+        return z3.Not(nex.first.acceptRet(self))
 
     @override
     def visitParenExpr(self, pex: ParenExpr) -> z3.ExprRef:
-        return pex.expr.acceptRet(self)
+        return pex.first.acceptRet(self)
 
     @override
-    def visitAndExpr(self, aex: AndExpr) -> z3.ExprRef:
-        return z3.And(aex.first.acceptRet(self))
+    def visitAndExpr(self) -> None:
+        pass
 
     @override
-    def visitOrExpr(self, oex: OrExpr) -> z3.ExprRef:
-        return z3.Or(oex.first.acceptRet(self))
+    def visitOrExpr(self) -> None:
+        pass
 
     @override
     def visitVar(self, va: Var) -> z3.ExprRef:
         return self.symbols[va.name]
+
 
 if __name__ == "__main__":
 
