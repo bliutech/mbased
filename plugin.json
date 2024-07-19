@@ -23,7 +23,12 @@
         "Linux": "",
         "Darwin": ""
     },
-    "dependencies": {},
+    "dependencies": {
+        "pip": [
+            "z3-solver",
+            "sympy"
+        ]
+    },
     "version": "0.0.1",
     "author": "Benson Liu",
     "minimumbinaryninjaversion": 0
