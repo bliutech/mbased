@@ -1,26 +1,7 @@
 import string
-from dataclasses import dataclass
 import re
-from typing import Generator
-import unittest
+from typing import Iterator
 import itertools
-
-
-@dataclass
-class Boolean:
-    """
-    A class to represent a boolean expression with raw and encoded forms.
-
-    Attributes
-    ----------
-    raw : str
-        The raw boolean expression.
-    encoded : str
-        The encoded boolean expression.
-    """
-
-    raw: str
-    encoded: str
 
 
 class NameGenerator:
@@ -47,7 +28,7 @@ class NameGenerator:
         Constructs all the necessary attributes for the NameGenerator object.
         """
         self.generated_dictionary_keys: dict[str, str] = {}
-        self.prev_state = []
+        self.prev_state: list[str] = []
 
     def generate_name(self, conditional: str) -> str:
         """
@@ -64,7 +45,8 @@ class NameGenerator:
             The generated name.
         """
         replaced_conditional = re.sub("!=", "==", conditional)
-        if self.generated_dictionary_keys.get(replaced_conditional) == None:
+        val: str | None = self.generated_dictionary_keys.get(replaced_conditional)
+        if val is None:
             gen_key: str = next(self.generate_unique_uppercase_string())
             self.generated_dictionary_keys[replaced_conditional] = gen_key
             if conditional != replaced_conditional:
@@ -72,11 +54,11 @@ class NameGenerator:
             return gen_key
         else:
             if conditional != replaced_conditional:
-                return "! " + self.generated_dictionary_keys.get(replaced_conditional)
+                return "! " + val
             else:
-                return self.generated_dictionary_keys.get(replaced_conditional)
+                return val
 
-    def generate_unique_uppercase_string(self) -> Generator[str, None, None]:
+    def generate_unique_uppercase_string(self) -> Iterator[str]:
         """
         Generates a unique uppercase string.
         }
@@ -132,21 +114,12 @@ class DictionaryEncoder:
             The encoded string.
         """
 
-        mlil_if_string.index
-
         first_index: int = mlil_if_string.index("(")
         last_index: int = len(mlil_if_string) - mlil_if_string[::-1].index(")")
-        """first_times: int = -1
-        for i in range(len(mlil_if_string)):
-            if mlil_if_string[i] == "(" and first_times < 0:
-                first_index = i
-                first_times += 1
-            elif mlil_if_string[i] == ")":
-                last_index = i + 1"""
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
+        LOGICAL_OPERATORS: str = r"(\|\||&&|!(?!\=)|\(|\))"
         split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
@@ -197,7 +170,7 @@ class DictionaryDecoder:
             The decoded string.
         """
 
-        LOGICAL_OPERATORS_DECODER: re.Pattern = r"(\w+|\|\||&&|[!()&|])"
+        LOGICAL_OPERATORS_DECODER: str = r"(\w+|\|\||&&|[!()&|])"
         tokens: list[str] = re.split(LOGICAL_OPERATORS_DECODER, encoded_str)
         tokens = [cond.strip() for cond in tokens if cond.strip()]
         decoded_parts: list[str] = []
@@ -212,6 +185,7 @@ class DictionaryDecoder:
                     decoded_parts.append(tokens[i])
             elif tokens[i] == "!":
                 i += 1
+                # TODO: Replace this code with a bidirectional hashmap
                 replace_not_equals: str = list(self.mapping.keys())[
                     list(self.mapping.values()).index(tokens[i])
                 ]
