@@ -34,11 +34,12 @@ def run_pass(ast: Expr) -> Expr:
     # this is a hack to fix that
 
     # Pattern to match "Xor(A, B)"
-    pattern = r"Xor\((\w+), (\w+)\)"
+    pattern = r"Xor\(([A-Z \|&\^\(\)]+), ([A-Z \|&\^\(\)]+)\)"
     # Replacement string using backreferences to capture groups
     replacement = r"\1 ^ \2"
-    # Performing the replacement
-    simplifiedStr = re.sub(pattern, replacement, simplifiedStr)
+    # Performing the replacement. Loop to catch nested Xor calls
+    while re.match(pattern, simplifiedStr):
+        simplifiedStr = re.sub(pattern, replacement, simplifiedStr)
 
     l: Lexer = Lexer()
     l.lex(simplifiedStr)
