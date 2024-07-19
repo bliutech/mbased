@@ -24,5 +24,5 @@ class OpCounter(Visitor):
         OpCounter._count += 1
         oex.first.accept(self)
 
-    def getCount(self) -> None:
+    def getCount(self) -> int:
         return self._count
