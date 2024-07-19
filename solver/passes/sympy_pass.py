@@ -97,4 +97,3 @@ if __name__ == "__main__":
     ast: Expr = p.parse(l.tokens)
 
     sympyOut: Expr = run_pass(ast)
-    breakpoint()
