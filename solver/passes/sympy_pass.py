@@ -11,7 +11,6 @@ from parser.ast import (
 from parser.visitor import Visitor, RetVisitor
 from parser.parse import Parser
 from parser.lex import Lexer
-from typing import override
 
 from sympy import Symbol, And, Or, Not, simplify_logic, Expr as SympyExpr
 
@@ -60,34 +59,42 @@ class TranslateToSympy(RetVisitor[SympyExpr]):
     returns an expression translated to Sympy logic.
     """
 
-    @override
     def __init__(self, symbolMap: dict[str, Symbol]):
-        self.symbolMap = symbolMap
+        self.symbolMap: SympyExpr = symbolMap
 
-    @override
     def visitVarExpr(self, vex: "VarExpr") -> SympyExpr:
-        if not vex.second:
-            return vex.first.acceptRet(self)
+        first: SympyExpr = vex.first.acceptRet(self)
+        if vex.second:
+            second: SympyExpr = vex.second.acceptRet(self)
+            if isinstance(vex.second, AndExpr):
+                return And(first, second)
+            elif isinstance(vex.second, OrExpr):
+                return Or(first, second)
+        return first
 
-        return vex.second.acceptParamRet(self, vex.first)
-
-    @override
     def visitNotExpr(self, nex: "NotExpr") -> SympyExpr:
         return Not(nex.first.acceptRet(self))
 
-    @override
     def visitParenExpr(self, pex: "ParenExpr") -> SympyExpr:
         return pex.first.acceptRet(self)
 
-    @override
-    def visitAndExpr(self, aex: "AndExpr", leftOperand: "Expr") -> SympyExpr:
-        return And(leftOperand.acceptRet(self), aex.first.acceptRet(self))
+    def visitAndExpr(self, aex: "AndExpr") -> SympyExpr:
+        return And(aex.first.acceptRet(self))
 
-    @override
-    def visitOrExpr(self, oex: "OrExpr", leftOperand: "Expr") -> SympyExpr:
-        return Or(leftOperand.acceptRet(self), oex.first.acceptRet(self))
+    def visitOrExpr(self, oex: "OrExpr") -> SympyExpr:
+        return Or(oex.first.acceptRet(self))
 
-    @override
     def visitVar(self, var: "Var") -> SympyExpr:
-        varSymbol = self.symbolMap[var.name]
+        varSymbol: dict[str, Symbol] = self.symbolMap[var.name]
         return varSymbol
+
+
+if __name__ == "__main__":
+    l: Lexer = Lexer()
+    l.lex("B & A | !A")
+
+    p: Parser = Parser()
+    ast: Expr = p.parse(l.tokens)
+
+    sympyOut: Expr = run_pass(ast)
+    breakpoint()
