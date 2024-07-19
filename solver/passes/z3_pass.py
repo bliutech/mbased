@@ -34,7 +34,7 @@ def run_pass(ast: Expr) -> Expr:
     # this is a hack to fix that
 
     # Pattern to match "Xor(A, B)"
-    pattern = r"Xor\(([A-Z \|&\^\(\)]+), ([A-Z \|&\^\(\)]+)\)"
+    pattern = r"Xor\(([A-Z \|&!\^\(\)]+), ([A-Z \|&!\^\(\)]+)\)"
     # Replacement string using backreferences to capture groups
     replacement = r"\1 ^ \2"
     # Performing the replacement. Loop to catch nested Xor calls
