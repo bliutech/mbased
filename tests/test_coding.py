@@ -1,6 +1,9 @@
 from unittest import TestCase
 from utils.coding import DictionaryEncoder, DictionaryDecoder
 
+# TODO: rewrite this with subtests and using a bidirectional hash map
+# to represent the tabled test cases since they are repetitive.
+
 
 class TestDictionaryEncoder(TestCase):
     """
