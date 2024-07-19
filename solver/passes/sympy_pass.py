@@ -11,6 +11,7 @@ from parser.ast import (
 from parser.visitor import Visitor, RetVisitor
 from parser.parse import Parser
 from parser.lex import Lexer
+from typing import override
 
 from sympy import Symbol, And, Or, Not, simplify_logic, Expr as SympyExpr
 
@@ -46,6 +47,7 @@ class SympyMappingVisitor(Visitor):
     def __init__(self):
         self.symbolMap: dict[str, Symbol] = {}
 
+    @override
     def visitVar(self, var: "Var") -> None:
         self.symbolMap[str(var)] = Symbol(str(var))
 
@@ -59,6 +61,7 @@ class TranslateToSympy(RetVisitor[SympyExpr]):
     returns an expression translated to Sympy logic.
     """
 
+    @override
     def __init__(self, symbolMap: dict[str, Symbol]):
         self.symbolMap: SympyExpr = symbolMap
 
@@ -72,18 +75,23 @@ class TranslateToSympy(RetVisitor[SympyExpr]):
                 return Or(first, second)
         return first
 
+    @override
     def visitNotExpr(self, nex: "NotExpr") -> SympyExpr:
         return Not(nex.first.acceptRet(self))
 
+    @override
     def visitParenExpr(self, pex: "ParenExpr") -> SympyExpr:
         return pex.first.acceptRet(self)
 
+    @override
     def visitAndExpr(self, aex: "AndExpr") -> SympyExpr:
         return And(aex.first.acceptRet(self))
 
+    @override
     def visitOrExpr(self, oex: "OrExpr") -> SympyExpr:
         return Or(oex.first.acceptRet(self))
 
+    @override
     def visitVar(self, var: "Var") -> SympyExpr:
         varSymbol: dict[str, Symbol] = self.symbolMap[var.name]
         return varSymbol
