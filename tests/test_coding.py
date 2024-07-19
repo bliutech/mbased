@@ -1,8 +1,8 @@
 from unittest import TestCase
-from utils.coding import DictionaryEncoder
+from utils.coding import DictionaryEncoder, DictionaryDecoder
 
 
-class TestDictionaryEncoder(unittest.TestCase):
+class TestDictionaryEncoder(TestCase):
     """
     A class to test the DictionaryEncoder class.
 
@@ -31,7 +31,7 @@ class TestDictionaryEncoder(unittest.TestCase):
             )
 
 
-class TestDictionaryDecoder(unittest.TestCase):
+class TestDictionaryDecoder(TestCase):
     """
     A class to test the DictionaryDecoder class.
 
