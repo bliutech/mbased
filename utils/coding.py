@@ -146,7 +146,7 @@ class DictionaryEncoder:
 
         condition: str = mlil_if_string[first_index:last_index]
 
-        LOGICAL_OPERATORS: str = r"(\|\||&&|!(?!\=)|\(|\))"
+        LOGICAL_OPERATORS: re.Pattern = r"(\|\||&&|!(?!\=)|\(|\))"
         split_conditions: list[str] = re.split(LOGICAL_OPERATORS, condition)
         split_conditions = [cond.strip() for cond in split_conditions if cond.strip()]
 
@@ -201,7 +201,6 @@ class DictionaryDecoder:
         tokens: list[str] = re.split(LOGICAL_OPERATORS_DECODER, encoded_str)
         tokens = [cond.strip() for cond in tokens if cond.strip()]
         decoded_parts: list[str] = []
-
         i: int = 0
         while i < len(tokens):
             if tokens[i] in {"|", "&", "(", ")"}:
@@ -213,13 +212,16 @@ class DictionaryDecoder:
                     decoded_parts.append(tokens[i])
             elif tokens[i] == "!":
                 i += 1
-                replace_not_equals: str = self.mappings[tokens[i]]
+                replace_not_equals: str = list(self.mapping.keys())[
+                    list(self.mapping.values()).index(tokens[i])
                 ]
                 replace_not_equals = re.sub("==", "!=", replace_not_equals)
                 decoded_parts.append(replace_not_equals)
             else:
                 decoded_parts.append(
-                    self.mappings[tokens[i]]
+                    list(self.mapping.keys())[
+                        list(self.mapping.values()).index(tokens[i])
+                    ]
                 )
             i += 1
 
