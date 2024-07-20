@@ -2,7 +2,20 @@ from typing import TYPE_CHECKING, TypeVar, Generic
 from abc import abstractmethod
 
 if TYPE_CHECKING:
-    from parser.ast import VarExpr, NotExpr, ParenExpr, AndExpr, OrExpr
+    from parser.ast import (
+        TermExpr,
+        OrExpr,
+        AndExpr,
+        XorExpr,
+        ParenTerm,
+        NotTerm,
+        VarVar,
+        TrueConst,
+        FalseConst,
+    )
+
+R = TypeVar("R")
+T = TypeVar("T")
 
 
 class Visitor:
@@ -10,28 +23,40 @@ class Visitor:
     A visitor that visits each node in the AST.
     """
 
-    def visitVarExpr(self, vex: "VarExpr") -> None:
-        vex.first.accept(self)
-        if vex.second:
-            vex.second.accept(self)
+    def visitTermExpr(self, node: "TermExpr") -> None:
+        node.first.accept(self)
+        if node.second:
+            node.second.accept(self)
 
-    def visitNotExpr(self, nex: "NotExpr") -> None:
-        nex.first.accept(self)
+    def visitOrExpr(self, node: "OrExpr") -> None:
+        node.first.accept(self)
+        if node.second:
+            node.second.accept(self)
 
-    def visitParenExpr(self, pex: "ParenExpr") -> None:
-        pex.first.accept(self)
+    def visitAndExpr(self, node: "AndExpr") -> None:
+        node.first.accept(self)
+        if node.second:
+            node.second.accept(self)
 
-    def visitAndExpr(self, aex: "AndExpr") -> None:
-        aex.first.accept(self)
+    def visitXorExpr(self, node: "XorExpr") -> None:
+        node.first.accept(self)
+        if node.second:
+            node.second.accept(self)
 
-    def visitOrExpr(self, oex: "OrExpr") -> None:
-        oex.first.accept(self)
+    def visitParenTerm(self, node: "ParenTerm") -> None:
+        node.first.accept(self)
 
-    def visitVar(self, _) -> None:
+    def visitNotTerm(self, node: "NotTerm") -> None:
+        node.first.accept(self)
+
+    def visitVarVar(self, node: "VarVar") -> None:
         pass
 
+    def visitTrueConst(self, node: "TrueConst") -> None:
+        pass
 
-T = TypeVar("T")
+    def visitFalseConst(self, node: "FalseConst") -> None:
+        pass
 
 
 class ParamVisitor(Generic[T]):
@@ -40,28 +65,40 @@ class ParamVisitor(Generic[T]):
     passes a parameter.
     """
 
-    def visitVarExpr(self, vex: "VarExpr", param: T) -> None:
-        vex.first.accept(self, param)
-        if vex.second:
-            vex.second.accept(self, param)
+    def visitTermExpr(self, node: "TermExpr", param: T) -> None:
+        node.first.accept(self, param)
+        if node.second:
+            node.second.accept(self, param)
 
-    def visitNotExpr(self, nex: "NotExpr", param: T) -> None:
-        nex.first.accept(self, param)
+    def visitOrExpr(self, node: "OrExpr", param: T) -> None:
+        node.first.accept(self, param)
+        if node.second:
+            node.second.accept(self, param)
 
-    def visitParenExpr(self, pex: "ParenExpr", param: T) -> None:
-        pex.first.accept(self, param)
+    def visitAndExpr(self, node: "AndExpr", param: T) -> None:
+        node.first.accept(self, param)
+        if node.second:
+            node.second.accept(self, param)
 
-    def visitAndExpr(self, aex: "AndExpr", param: T) -> None:
-        aex.first.accept(self, param)
+    def visitXorExpr(self, node: "XorExpr", param: T) -> None:
+        node.first.accept(self, param)
+        if node.second:
+            node.second.accept(self, param)
 
-    def visitOrExpr(self, oex: "OrExpr", param: T) -> None:
-        oex.first.accept(self, param)
+    def visitParenTerm(self, node: "ParenTerm", param: T) -> None:
+        node.first.accept(self, param)
 
-    def visitVar(self, _, param: T) -> None:
+    def visitNotTerm(self, node: "NotTerm", param: T) -> None:
+        node.first.accept(self, param)
+
+    def visitVarVar(self, node: "VarVar", param: T) -> None:
         pass
 
+    def visitTrueConst(self, node: "TrueConst", param: T) -> None:
+        pass
 
-R = TypeVar("R")
+    def visitFalseConst(self, node: "FalseConst", param: T) -> None:
+        pass
 
 
 class RetVisitor(Generic[R]):
@@ -71,56 +108,80 @@ class RetVisitor(Generic[R]):
     """
 
     @abstractmethod
-    def visitVarExpr(self, vex: "VarExpr") -> R:
+    def visitTermExpr(self, node: "TermExpr") -> R:
         pass
 
     @abstractmethod
-    def visitNotExpr(self, nex: "NotExpr") -> R:
+    def visitOrExpr(self, node: "OrExpr") -> R:
         pass
 
     @abstractmethod
-    def visitParenExpr(self, pex: "ParenExpr") -> R:
+    def visitAndExpr(self, node: "AndExpr") -> R:
         pass
 
     @abstractmethod
-    def visitAndExpr(self, aex: "AndExpr") -> R:
+    def visitXorExpr(self, node: "XorExpr") -> R:
         pass
 
     @abstractmethod
-    def visitOrExpr(self, oex: "OrExpr") -> R:
+    def visitParenTerm(self, node: "ParenTerm") -> R:
         pass
 
     @abstractmethod
-    def visitVar(self, _) -> R:
+    def visitNotTerm(self, node: "NotTerm") -> R:
+        pass
+
+    @abstractmethod
+    def visitVarVar(self, node: "VarVar") -> R:
+        pass
+
+    @abstractmethod
+    def visitTrueConst(self, node: "TrueConst") -> R:
+        pass
+
+    @abstractmethod
+    def visitFalseConst(self, node: "FalseConst") -> R:
         pass
 
 
-class RetParamVisitor(Generic[R, T]):
+class RetParamVisitor(Generic[T, R]):
     """
     A visitor that visits each node in the AST and
     returns a value and passes a parameter.
     """
 
     @abstractmethod
-    def visitVarExpr(self, vex: "VarExpr", param: T) -> R:
+    def visitTermExpr(self, node: "TermExpr", param: T) -> R:
         pass
 
     @abstractmethod
-    def visitNotExpr(self, nex: "NotExpr", param: T) -> R:
+    def visitOrExpr(self, node: "OrExpr", param: T) -> R:
         pass
 
     @abstractmethod
-    def visitParenExpr(self, pex: "ParenExpr", param: T) -> R:
+    def visitAndExpr(self, node: "AndExpr", param: T) -> R:
         pass
 
     @abstractmethod
-    def visitAndExpr(self, aex: "AndExpr", param: T) -> R:
+    def visitXorExpr(self, node: "XorExpr", param: T) -> R:
         pass
 
     @abstractmethod
-    def visitOrExpr(self, oex: "OrExpr", param: T) -> R:
+    def visitParenTerm(self, node: "ParenTerm", param: T) -> R:
         pass
 
     @abstractmethod
-    def visitVar(self, _, param: T) -> R:
+    def visitNotTerm(self, node: "NotTerm", param: T) -> R:
+        pass
+
+    @abstractmethod
+    def visitVarVar(self, node: "VarVar", param: T) -> R:
+        pass
+
+    @abstractmethod
+    def visitTrueConst(self, node: "TrueConst", param: T) -> R:
+        pass
+
+    @abstractmethod
+    def visitFalseConst(self, node: "FalseConst", param: T) -> R:
         pass

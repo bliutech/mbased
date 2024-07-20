@@ -2,10 +2,21 @@ from typing import override
 
 import html, re
 
-from parser.ast import AndExpr, OrExpr, Expr, NotExpr, ParenExpr, Var, VarExpr
+from parser.ast import (
+    Expr,
+    TermExpr,
+    OrExpr,
+    AndExpr,
+    XorExpr,
+    ParenTerm,
+    NotTerm,
+    VarVar,
+    TrueConst,
+    FalseConst,
+)
 from parser.visitor import Visitor, RetVisitor
-from parser.lex import Lexer
 from parser.parse import Parser
+from parser.lex import Lexer
 
 import z3
 
@@ -55,45 +66,86 @@ class Z3MappingVisitor(Visitor):
         self.symbols: dict[str, z3.Bool] = {}
 
     @override
-    def visitVar(self, va: Var):
-        self.symbols[va.name] = z3.Bool(va.name)
+    def visitVarVar(self, node: VarVar) -> None:
+        self.symbols[node.name] = z3.Bool(node.name)
 
 
 class TranslateToZ3(RetVisitor[z3.ExprRef]):
 
     def __init__(self, symbols: dict[str, z3.Bool]) -> None:
-        self.symbols = symbols
+        self.symbols: dict[str, z3.Bool] = symbols
 
     @override
-    def visitVarExpr(self, vex: VarExpr) -> z3.ExprRef:
-        first: z3.ExprRef = vex.first.acceptRet(self)
-        if vex.second:
-            second: z3.ExprRef = vex.second.first.acceptRet(self)
-            if isinstance(vex.second, AndExpr):
-                return z3.And(first, second)
-            elif isinstance(vex.second, OrExpr):
+    def visitTermExpr(self, node: TermExpr) -> z3.ExprRef:
+        first: z3.ExprRef = node.first.acceptRet(self)
+        if node.second:
+            second: z3.ExprRef = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
                 return z3.Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return z3.And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return z3.Xor(first, second)
         return first
 
     @override
-    def visitNotExpr(self, nex: NotExpr) -> z3.ExprRef:
-        return z3.Not(nex.first.acceptRet(self))
+    def visitOrExpr(self, node: OrExpr) -> z3.ExprRef:
+        first: z3.ExprRef = node.first.acceptRet(self)
+        if node.second:
+            second: z3.ExprRef = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return z3.Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return z3.And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return z3.Xor(first, second)
+        return first
 
     @override
-    def visitParenExpr(self, pex: ParenExpr) -> z3.ExprRef:
-        return pex.first.acceptRet(self)
+    def visitAndExpr(self, node: AndExpr) -> z3.ExprRef:
+        first: z3.ExprRef = node.first.acceptRet(self)
+        if node.second:
+            second: z3.ExprRef = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return z3.Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return z3.And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return z3.Xor(first, second)
+        return first
 
     @override
-    def visitAndExpr(self) -> None:
-        pass
+    def visitXorExpr(self, node: XorExpr) -> z3.ExprRef:
+        first: z3.ExprRef = node.first.acceptRet(self)
+        if node.second:
+            second: z3.ExprRef = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return z3.Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return z3.And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return z3.Xor(first, second)
+        return first
 
     @override
-    def visitOrExpr(self) -> None:
-        pass
+    def visitParenTerm(self, node: ParenTerm) -> z3.ExprRef:
+        return node.first.acceptRet(self)
 
     @override
-    def visitVar(self, va: Var) -> z3.ExprRef:
-        return self.symbols[va.name]
+    def visitNotTerm(self, node: NotTerm) -> z3.ExprRef:
+        return z3.Not(node.first.acceptRet(self))
+
+    @override
+    def visitVarVar(self, node: VarVar) -> z3.ExprRef:
+        return self.symbols[node.name]
+
+    @override
+    def visitTrueConst(self, node: TrueConst) -> z3.ExprRef:
+        return z3.BoolVal(True)
+
+    @override
+    def visitFalseConst(self, node: FalseConst) -> z3.ExprRef:
+        return z3.BoolVal(False)
 
 
 if __name__ == "__main__":

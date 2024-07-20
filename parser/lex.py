@@ -3,7 +3,7 @@ import sys
 
 
 class Lexer:
-    terminals: str = r"\&|\||\!|\(|\)|[A-Z]+"
+    terminals: str = r"\&|\||\^|\!|\(|\)|[A-Z]+|t|f"
     ws: str = r"\s|\t|\n|\r"
     eof: str = r"\Z"
 

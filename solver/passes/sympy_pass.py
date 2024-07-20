@@ -1,19 +1,23 @@
 from typing import override
+
 from parser.ast import (
-    Var,
     Expr,
-    VarExpr,
-    NotExpr,
-    ParenExpr,
-    AndExpr,
+    TermExpr,
     OrExpr,
+    AndExpr,
+    XorExpr,
+    ParenTerm,
+    NotTerm,
+    VarVar,
+    TrueConst,
+    FalseConst,
 )
 from parser.visitor import Visitor, RetVisitor
 from parser.parse import Parser
 from parser.lex import Lexer
 
 import sympy
-from sympy.logic.boolalg import And, Or, Not
+from sympy.logic.boolalg import Or, And, Xor, Not
 
 
 def run_pass(ast: Expr) -> Expr:
@@ -39,15 +43,15 @@ def run_pass(ast: Expr) -> Expr:
 
 class SympyMappingVisitor(Visitor):
     """
-    A visitor that visits each node in the AST and adds Var nodes to the symbolMap.
+    A visitor that visits each node in the AST and adds Var nodes to the symbols.
     """
 
     def __init__(self) -> None:
-        self.symbolMap: dict[str, sympy.Symbol] = {}
+        self.symbols: dict[str, sympy.Symbol] = {}
 
     @override
-    def visitVar(self, va: Var) -> None:
-        self.symbolMap[va.name] = sympy.Symbol(va.name)
+    def visitVarVar(self, node: VarVar) -> None:
+        self.symbols[node.name] = sympy.Symbol(node.name)
 
 
 class TranslateToSympy(RetVisitor[sympy.Basic]):
@@ -60,35 +64,76 @@ class TranslateToSympy(RetVisitor[sympy.Basic]):
         self.symbols = symbols
 
     @override
-    def visitVarExpr(self, vex: VarExpr) -> sympy.Basic:
-        first: sympy.Basic = vex.first.acceptRet(self)
-        if vex.second:
-            second: sympy.Basic = vex.second.first.acceptRet(self)
-            if isinstance(vex.second, AndExpr):
-                return And(first, second)
-            elif isinstance(vex.second, OrExpr):
+    def visitTermExpr(self, node: TermExpr) -> sympy.Basic:
+        first: sympy.Basic = node.first.acceptRet(self)
+        if node.second:
+            second: sympy.Basic = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
                 return Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return Xor(first, second)
         return first
 
     @override
-    def visitNotExpr(self, nex: NotExpr) -> sympy.Basic:
-        return Not(nex.first.acceptRet(self))
+    def visitOrExpr(self, node: OrExpr) -> sympy.Basic:
+        first: sympy.Basic = node.first.acceptRet(self)
+        if node.second:
+            second: sympy.Basic = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return Xor(first, second)
+        return first
 
     @override
-    def visitParenExpr(self, pex: ParenExpr) -> sympy.Basic:
-        return pex.first.acceptRet(self)
+    def visitAndExpr(self, node: AndExpr) -> sympy.Basic:
+        first: sympy.Basic = node.first.acceptRet(self)
+        if node.second:
+            second: sympy.Basic = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return Xor(first, second)
+        return first
 
     @override
-    def visitAndExpr(self, aex: AndExpr) -> sympy.Basic:
-        pass
+    def visitXorExpr(self, node: XorExpr) -> sympy.Basic:
+        first: sympy.Basic = node.first.acceptRet(self)
+        if node.second:
+            second: sympy.Basic = node.second.acceptRet(self)
+            if isinstance(node.second, OrExpr):
+                return Or(first, second)
+            elif isinstance(node.second, AndExpr):
+                return And(first, second)
+            elif isinstance(node.second, XorExpr):
+                return Xor(first, second)
+        return first
 
     @override
-    def visitOrExpr(self, oex: OrExpr) -> sympy.Basic:
-        pass
+    def visitParenTerm(self, node: ParenTerm) -> sympy.Basic:
+        return node.first.acceptRet(self)
 
     @override
-    def visitVar(self, va: Var) -> sympy.Basic:
-        return self.symbols[va.name]
+    def visitNotTerm(self, node: NotTerm) -> sympy.Basic:
+        return Not(node.first.acceptRet(self))
+
+    @override
+    def visitVarVar(self, node: VarVar) -> sympy.Basic:
+        return self.symbols[node.name]
+
+    @override
+    def visitTrueConst(self, node: TrueConst) -> sympy.Basic:
+        return sympy.true
+
+    @override
+    def visitFalseConst(self, node: FalseConst) -> sympy.Basic:
+        return sympy.false
 
 
 if __name__ == "__main__":
@@ -99,4 +144,6 @@ if __name__ == "__main__":
     p: Parser = Parser()
     ast: Expr = p.parse(l.tokens)
 
-    run_pass(ast)
+    simplified_ast: Expr = run_pass(ast)
+
+    assert str(simplified_ast) == "B"

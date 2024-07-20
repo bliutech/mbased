@@ -2,40 +2,11 @@
     Abstract Syntax Tree (AST) for boolean expressions.
 """
 
-from typing import TypeVar
+from typing import TypeVar, Optional
 from parser.visitor import Visitor, ParamVisitor, RetVisitor, RetParamVisitor
 
 T = TypeVar("T")
 R = TypeVar("R")
-
-
-class Var:
-    """
-    A class to represent a variable from A-Z.
-
-    Attributes
-    ----------
-    name : str
-        The name of the variable.
-    """
-
-    def __init__(self, name: str):
-        self.name = name
-
-    def __str__(self) -> str:
-        return self.name
-
-    def accept(self, v: Visitor) -> None:
-        v.visitVar(self)
-
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
-        v.visitVar(self, param)
-
-    def acceptRet(self, v: RetVisitor) -> R:
-        return v.visitVar(self)
-
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
-        return v.visitVar(self, param)
 
 
 class Node:
@@ -44,6 +15,9 @@ class Node:
     """
 
     pass
+
+
+# =============================================================================
 
 
 class Expr(Node):
@@ -56,39 +30,65 @@ class Expr(Node):
 
 class ExprPrime(Node):
     """
-    An interface class to represent a prime expression. Used to eliminate left-recursion.
+    An interface class to represent an expr prime expression. Used to eliminate left-recursion.
     """
 
     pass
 
 
-class AndExpr(ExprPrime):
+class Term(Node):
     """
-    A class to represent an AND expression.
+    An interface class to represent a term. Used to add precedence to the grammar.
+    """
+
+    pass
+
+
+class Var(Term):
+    """
+    An interface class to represent a var. Used for constants and variables.
+    """
+
+
+# =============================================================================
+
+
+class TermExpr(Expr):
+    """
+    A class to represent an expression containing only a Term node.
 
     Attributes
     ----------
-    first : Expr
-        The first part of the AND expression.
+    first : Term
+        The variable contained by the TermExpr.
+
+    second : Optional[ExprPrime]
     """
 
-    def __init__(self, first: Expr):
+    def __init__(self, first: Term, second: Optional[ExprPrime] = None):
         self.first = first
+        self.second = second
 
     def __str__(self) -> str:
-        return f"& {self.first}"
+        if self.second is not None:
+            return f"{self.first} {self.second}"
+
+        return str(self.first)
 
     def accept(self, v: Visitor) -> None:
-        v.visitAndExpr(self)
+        v.visitTermExpr(self)
 
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
-        v.visitAndExpr(self, param)
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitTermExpr(self, param)
 
-    def acceptRet(self, v: RetVisitor) -> R:
-        return v.visitAndExpr(self)
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitTermExpr(self)
 
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
-        return v.visitAndExpr(self, param)
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitTermExpr(self, param)
+
+
+# =============================================================================
 
 
 class OrExpr(ExprPrime):
@@ -97,102 +97,119 @@ class OrExpr(ExprPrime):
 
     Attributes
     ----------
-    first : Expr
+    first : Term
         The first part of the OR expression.
+
+    second : Optional[ExprPrime]
+        The second (or following) part of the OR expression.
     """
 
-    def __init__(self, first: Expr):
+    def __init__(self, first: Term, second: Optional[ExprPrime] = None):
         self.first = first
+        self.second = second
 
     def __str__(self) -> str:
+        if self.second is not None:
+            return f"| {self.first} {self.second}"
+
         return f"| {self.first}"
 
     def accept(self, v: Visitor) -> None:
         v.visitOrExpr(self)
 
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
         v.visitOrExpr(self, param)
 
-    def acceptRet(self, v: RetVisitor) -> R:
+    def acceptRet(self, v: RetVisitor[R]) -> R:
         return v.visitOrExpr(self)
 
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
         return v.visitOrExpr(self, param)
 
 
-class VarExpr(Expr):
+class AndExpr(ExprPrime):
     """
-    A class to represent an expression containing only a Var node.
+    A class to represent an AND expression.
 
     Attributes
     ----------
-    first : Var
-        The variable contained by the VarExpr.
+    first : Term
+        The first part of the AND expression.
 
-    second : ExprPrime, Optional
-        Optional attribute for containing the "AndExpr", "OrExpr", or "None" (for epsilon case).
+    second : Optional[ExprPrime]
+        The second (or following) part of the AND expression.
     """
 
-    def __init__(self, first: Var, second: ExprPrime = None):
+    def __init__(self, first: Term, second: Optional[ExprPrime] = None):
         self.first = first
         self.second = second
 
     def __str__(self) -> str:
-        if not self.second:
-            return str(self.first)
+        if self.second is not None:
+            return f"& {self.first} {self.second}"
 
-        return f"{self.first} {self.second}"
+        return f"& {self.first}"
 
     def accept(self, v: Visitor) -> None:
-        v.visitVarExpr(self)
+        v.visitAndExpr(self)
 
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
-        v.visitVarExpr(self, param)
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitAndExpr(self, param)
 
-    def acceptRet(self, v: RetVisitor) -> R:
-        return v.visitVarExpr(self)
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitAndExpr(self)
 
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
-        return v.visitVarExpr(self, param)
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitAndExpr(self, param)
 
 
-class NotExpr(Expr):
+class XorExpr(ExprPrime):
     """
-    A class to represent a NOT expression.
+    A class to represent an XOR expression.
 
     Attributes
     ----------
-    first : Expr
-        The first part of the NOT expression.
+    first : Term
+        The first part of the XOR expression.
+
+    second : Optional[ExprPrime]
+        The second (or following) part of the XOR expression.
     """
 
-    def __init__(self, first: Expr):
+    def __init__(self, first: Term, second: Optional[ExprPrime] = None):
         self.first = first
+        self.second = second
 
     def __str__(self) -> str:
-        return f"!{self.first}"
+        if self.second is not None:
+            return f"^ {self.first} {self.second}"
+
+        return f"^ {self.first}"
 
     def accept(self, v: Visitor) -> None:
-        v.visitNotExpr(self)
+        v.visitXorExpr(self)
 
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
-        v.visitNotExpr(self, param)
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitXorExpr(self, param)
 
-    def acceptRet(self, v: RetVisitor) -> R:
-        return v.visitNotExpr(self)
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitXorExpr(self)
 
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
-        return v.visitNotExpr(self, param)
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitXorExpr(self, param)
 
 
-class ParenExpr(Expr):
+# =============================================================================
+
+
+class ParenTerm(Term):
     """
-    A class to represent a parenthesized expression.
+    A class to represent a parenthesized term.
 
     Attributes
     ----------
     first : Expr
-        The first part of the parenthesized expression.
+        The first part of the parenthesized term.
     """
 
     def __init__(self, first: Expr):
@@ -202,13 +219,116 @@ class ParenExpr(Expr):
         return f"({self.first})"
 
     def accept(self, v: Visitor) -> None:
-        v.visitParenExpr(self)
+        v.visitParenTerm(self)
 
-    def acceptParam(self, v: ParamVisitor, param: T) -> None:
-        v.visitParenExpr(self, param)
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitParenTerm(self, param)
 
-    def acceptRet(self, v: RetVisitor) -> R:
-        return v.visitParenExpr(self)
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitParenTerm(self)
 
-    def acceptParamRet(self, v: RetParamVisitor, param: T) -> R:
-        return v.visitParenExpr(self, param)
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitParenTerm(self, param)
+
+
+class NotTerm(Term):
+    """
+    A class to represent a NOT term.
+
+    Attributes
+    ----------
+    first : Term
+        The first part of the NOT term.
+    """
+
+    def __init__(self, first: Term):
+        self.first = first
+
+    def __str__(self) -> str:
+        return f"!{self.first}"
+
+    def accept(self, v: Visitor) -> None:
+        v.visitNotTerm(self)
+
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitNotTerm(self, param)
+
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitNotTerm(self)
+
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitNotTerm(self, param)
+
+
+# =============================================================================
+
+
+class VarVar(Term):
+    """
+    A class to represent a variable from A-Z.
+
+    Attributes
+    ----------
+    name : str
+        The name of the variable.
+    """
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __str__(self) -> str:
+        return self.name
+
+    def accept(self, v: Visitor) -> None:
+        v.visitVarVar(self)
+
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitVarVar(self, param)
+
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitVarVar(self)
+
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitVarVar(self, param)
+
+
+class TrueConst(Var):
+    """
+    Represents the constant TRUE
+    """
+
+    def __str__(self) -> str:
+        return "t"
+
+    def accept(self, v: Visitor) -> None:
+        v.visitTrueConst(self)
+
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitTrueConst(self, param)
+
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitTrueConst(self)
+
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitTrueConst(self, param)
+
+
+class FalseConst(Var):
+    """
+    Represents the constant FALSE.
+    """
+
+    def __str__(self) -> str:
+        return "f"
+
+    def accept(self, v: Visitor) -> None:
+        v.visitFalseConst(self)
+
+    def acceptParam(self, v: ParamVisitor[T], param: T) -> None:
+        v.visitFalseConst(self, param)
+
+    def acceptRet(self, v: RetVisitor[R]) -> R:
+        return v.visitFalseConst(self)
+
+    def acceptParamRet(self, v: RetParamVisitor[T, R], param: T) -> R:
+        return v.visitFalseConst(self, param)
