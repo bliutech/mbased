@@ -1,6 +1,6 @@
 from typing import override
 
-from parser.ast import OrExpr, AndExpr, XorExpr, NotTerm
+from parser.ast import OrExpr, AndExpr, XorExpr, NotTerm, VarVar
 from parser.visitor import Visitor
 
 
@@ -38,3 +38,17 @@ class OpCounter(Visitor):
     def visitNotTerm(self, node: NotTerm) -> None:
         self._count += 1
         node.first.accept(self)
+
+
+class VarCounter(Visitor):
+    """Counts the number of boolean operators visited"""
+
+    def __init__(self) -> None:
+        self._count: int = 0
+
+    def getCount(self) -> int:
+        return self._count
+
+    @override
+    def visitVarVar(self, node: "VarVar") -> None:
+        self._count += 1
