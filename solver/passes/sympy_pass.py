@@ -30,7 +30,7 @@ def run_pass(ast: Expr) -> Expr:
     p: sympy.Basic = ast.acceptRet(tv)
 
     simplifiedExpr: sympy.Basic = sympy.simplify_logic(p)
-    simplifiedStr: str = str(simplifiedExpr)
+    simplifiedStr: str = str(simplifiedExpr).replace("~", "!")
 
     l: Lexer = Lexer()
     l.lex(simplifiedStr)

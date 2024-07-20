@@ -9,14 +9,20 @@ in some way. The passes are defined in the passes directory.
 import sys
 from importlib import import_module
 
+from parser.ast import Expr
+
 
 class Solver:
     def __init__(self, passes: list[str]):
         self.passes: list[str] = passes
 
+    def get_module(self, name: str):
+        print(f"Importing {name}")
+        return import_module(f"solver.passes.{name}")
+
     # TODO: Add type annotation for AST once classes are finished.
-    def run(self, ast):
-        for m in map(import_module, f"passes.{self.passes}"):
+    def run(self, ast: Expr) -> Expr:
+        for m in map(self.get_module, self.passes):
             try:
                 ast = m.run_pass(ast)
             except Exception as e:

@@ -12,6 +12,12 @@ from solver import Solver
 from utils.metrics import OpCounter
 
 
+def count_ops(ast: Expr) -> int:
+    oc: OpCounter = OpCounter()
+    ast.accept(oc)
+    return oc.getCount()
+
+
 def run_experiment(
     passes: list[str], n: int = 100
 ) -> list[tuple[int, str, int, str, int, str, int]]:
@@ -34,31 +40,31 @@ def run_experiment(
 
     bg: BooleanGenerator = BooleanGenerator()
     s: Solver = Solver(passes)
-    oc: OpCounter = OpCounter()
 
     for i in range(2, n + 1):
+        print("========================================", file=sys.stderr)
         print(f"Running experiment with n={i}", file=sys.stderr)
 
         expr: str = bg.generate_expr(i)
-        print(f"Original expression: {expr}", file=sys.stderr)
 
-        l: Lexer = Lexer(expr)
-        l.lex()
+        l: Lexer = Lexer()
+        l.lex(expr)
 
-        p: Parser = Parser(l.tokens)
-        orig_ast: Expr = p.parse()
+        p: Parser = Parser()
+        orig_ast: Expr = p.parse(l.tokens)
+        print(f"Original expression: {orig_ast}", file=sys.stderr)
 
-        orig_count = orig_ast.acceptRet(oc)
+        orig_count = count_ops(orig_ast)
         print(f"Original count: {orig_count}", file=sys.stderr)
 
         obf_ast = MBAObfuscator().obfuscate(orig_ast)
         print(f"Obfuscated expression: {obf_ast}", file=sys.stderr)
-        obf_count = obf_ast.acceptRet(oc)
+        obf_count = count_ops(obf_ast)
         print(f"Obfuscated count: {obf_count}", file=sys.stderr)
 
         simplified_ast = s.run(obf_ast)
         print(f"Simplified expression: {simplified_ast}", file=sys.stderr)
-        simplified_count = simplified_ast.acceptRet(oc)
+        simplified_count = count_ops(simplified_ast)
         print(f"Simplified count: {simplified_count}", file=sys.stderr)
 
         res.append(
