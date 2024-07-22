@@ -106,11 +106,21 @@ if __name__ == "__main__":
         "--plot", action="store_true", help="Display plots of the data."
     )
 
+    parser.add_argument(
+        "--npasses",
+        type=int,
+        nargs=1,
+        help="Sets the number of passes to run.",
+    )
+
     args: argparse.Namespace = parser.parse_args()
 
     passes: list[str] = ["sympy_pass"]
 
-    res = run_experiment(passes, 100)
+    if args.npasses:
+        res = run_experiment(passes, args.npasses[0])
+    else:
+        res = run_experiment(passes)
 
     print("========================================")
     print(res)
