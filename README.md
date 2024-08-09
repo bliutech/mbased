@@ -25,6 +25,16 @@ git clone https://github.com/bliutech/mbased.git
 
 Relaunch Binary Ninja, and you should see the MBASED plugin in the plugins list.
 
+## Running Experiments
+As part of this repository, there is an `experiments` module which can be run using `run_experiment.py` to test various configurations of the `Solver`. To run an experiment, use the following commands.
+
+```bash
+cd mbased/
+mv run_experiment.py ..
+cd ..
+python3 run_experiment.py
+```
+
 ## Contributing
 To contribute to this project, please open a pull request with your changes. If you are unsure about the changes you want to make, please open an issue to discuss it with one of the authors. For code health, please ensure that your code is clear and formatted. You can use the `black` code formatter to format your code. To install `black`, run `pip install black`. To format your code, run the following command.
 

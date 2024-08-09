@@ -4,7 +4,7 @@ Generate random boolean expressions for testing purposes.
 
 import random
 
-from utils.coding import NameGenerator
+from mbased.utils.coding import NameGenerator
 
 
 class BooleanGenerator:

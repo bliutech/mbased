@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from experiments.experiment import run_experiment
+from mbased.experiments.experiment import run_experiment
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np

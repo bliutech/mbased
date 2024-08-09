@@ -7,11 +7,11 @@ based on a few rules which are taken from the Obfuscator LLVM project. The rules
 at https://github.com/obfuscator-llvm/obfuscator/wiki/Instructions-Substitution
 """
 
-from typing import override
+from typing_extensions import override
 
-from parser.visitor import RetVisitor
+from mbased.parser.visitor import RetVisitor
 
-from parser.ast import (
+from mbased.parser.ast import (
     Node,
     Expr,
     TermExpr,

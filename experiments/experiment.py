@@ -1,15 +1,15 @@
 import sys
 
-from experiments.generator import BooleanGenerator
-from experiments.obfuscator import MBAObfuscator
+from mbased.experiments.generator import BooleanGenerator
+from mbased.experiments.obfuscator import MBAObfuscator
 
-from parser.lex import Lexer
-from parser.parse import Parser
-from parser.ast import Expr
+from mbased.parser.lex import Lexer
+from mbased.parser.parse import Parser
+from mbased.parser.ast import Expr
 
-from solver import Solver
+from mbased.solver import Solver
 
-from utils.metrics import OpCounter, VarCounter
+from mbased.utils.metrics import OpCounter, VarCounter
 
 
 def count_ops(ast: Expr) -> int:
