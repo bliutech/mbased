@@ -26,7 +26,8 @@
     "dependencies": {
         "pip": [
             "z3-solver",
-            "sympy"
+            "sympy",
+            "typing_extensions"
         ]
     },
     "version": "0.0.1",
