@@ -1,6 +1,6 @@
 from typing import Optional
 
-from parser.ast import (
+from mbased.parser.ast import (
     Expr,
     ExprPrime,
     Term,
@@ -34,8 +34,7 @@ class Parser:
 
     @staticmethod
     def error(msg: str, pos: int):
-        print(f"Parse error: {msg} at position {pos}", file=sys.stderr)
-        exit(1)
+        raise Exception(f"Parse error: {msg} at position {pos}")
 
     def parse(self, tokens: list[str]) -> Expr:
         """

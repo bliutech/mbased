@@ -12,8 +12,7 @@ class Lexer:
 
     @staticmethod
     def error(msg: str) -> None:
-        print(f"Lex error: {msg}", file=sys.stderr)
-        exit(1)
+        raise Exception(msg)
 
     def getTokens(self) -> list[str]:
         return self.tokens

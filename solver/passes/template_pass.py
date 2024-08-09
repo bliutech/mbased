@@ -1,5 +1,5 @@
-from parser.ast import Expr
-from parser.visitor import Visitor
+from mbased.parser.ast import Expr
+from mbased.parser.visitor import Visitor
 
 
 def run_pass(ast: Expr) -> Expr:

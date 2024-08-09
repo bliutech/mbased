@@ -9,7 +9,7 @@ in some way. The passes are defined in the passes directory.
 import sys
 from importlib import import_module
 
-from parser.ast import Expr
+from mbased.parser.ast import Expr
 
 
 class Solver:
@@ -17,10 +17,9 @@ class Solver:
         self.passes: list[str] = passes
 
     def get_module(self, name: str):
-        print(f"Importing {name}")
-        return import_module(f"solver.passes.{name}")
+        # print(f"Importing {name}")
+        return import_module(f"mbased.solver.passes.{name}")
 
-    # TODO: Add type annotation for AST once classes are finished.
     def run(self, ast: Expr) -> Expr:
         for m in map(self.get_module, self.passes):
             try:

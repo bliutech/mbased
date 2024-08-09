@@ -2,8 +2,8 @@ from typing_extensions import override
 
 import sys
 
-from parser.ast import AndExpr, OrExpr, Expr, NotExpr, ParenExpr, Var, VarExpr
-from parser.visitor import Visitor, RetVisitor
+from mbased.parser.ast import AndExpr, OrExpr, Expr, NotExpr, ParenExpr, Var, VarExpr
+from mbased.parser.visitor import Visitor, RetVisitor
 
 
 def run_pass(ast: Expr) -> Expr:

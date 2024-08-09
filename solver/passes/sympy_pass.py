@@ -1,6 +1,6 @@
 from typing_extensions import override
 
-from parser.ast import (
+from mbased.parser.ast import (
     Expr,
     TermExpr,
     OrExpr,
@@ -12,9 +12,9 @@ from parser.ast import (
     TrueConst,
     FalseConst,
 )
-from parser.visitor import Visitor, RetVisitor
-from parser.parse import Parser
-from parser.lex import Lexer
+from mbased.parser.visitor import Visitor, RetVisitor
+from mbased.parser.parse import Parser
+from mbased.parser.lex import Lexer
 
 import sympy
 from sympy.logic.boolalg import Or, And, Xor, Not

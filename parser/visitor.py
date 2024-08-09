@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, TypeVar, Generic
 from abc import abstractmethod
 
 if TYPE_CHECKING:
-    from parser.ast import (
+    from mbased.parser.ast import (
         TermExpr,
         OrExpr,
         AndExpr,

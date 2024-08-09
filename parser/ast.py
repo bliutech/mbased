@@ -3,7 +3,7 @@
 """
 
 from typing import TypeVar, Optional
-from parser.visitor import Visitor, ParamVisitor, RetVisitor, RetParamVisitor
+from mbased.parser.visitor import Visitor, ParamVisitor, RetVisitor, RetParamVisitor
 
 T = TypeVar("T")
 R = TypeVar("R")

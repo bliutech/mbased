@@ -1,7 +1,7 @@
 from typing import override
 
-from parser.ast import OrExpr, AndExpr, XorExpr, NotTerm, VarVar
-from parser.visitor import Visitor
+from mbased.parser.ast import OrExpr, AndExpr, XorExpr, NotTerm, VarVar
+from mbased.parser.visitor import Visitor
 
 
 class OpCounter(Visitor):
