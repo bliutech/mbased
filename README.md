@@ -32,6 +32,9 @@ cd mbased/
 mv run_experiment.py ..
 cd ..
 python3 run_experiment.py
+
+# For the possible argument options, run the following.
+python3 run_experiment.py --help
 ```
 
 ## Contributing
