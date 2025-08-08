@@ -71,7 +71,6 @@ class Z3MappingVisitor(Visitor):
 
 
 class TranslateToZ3(RetVisitor[z3.ExprRef]):
-
     def __init__(self, symbols: dict[str, z3.Bool]) -> None:
         self.symbols: dict[str, z3.Bool] = symbols
 
@@ -149,7 +148,6 @@ class TranslateToZ3(RetVisitor[z3.ExprRef]):
 
 
 if __name__ == "__main__":
-
     prog: str = "!(!(B | !C))"
     l: Lexer = Lexer()
     l.lex(prog)

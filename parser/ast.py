@@ -1,5 +1,5 @@
 """
-    Abstract Syntax Tree (AST) for boolean expressions.
+Abstract Syntax Tree (AST) for boolean expressions.
 """
 
 from typing import TypeVar, Optional
