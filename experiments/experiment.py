@@ -40,9 +40,9 @@ def run_experiment(
     if n < 2:
         n = 2
 
-    res: list[
-        tuple[int, str, int, str, int, str, int]
-    ] = []  # (n, original, original_count, obfuscated, obfuscated_count, simplified, simplified_count)
+    res: list[tuple[int, str, int, str, int, str, int]] = (
+        []
+    )  # (n, original, original_count, obfuscated, obfuscated_count, simplified, simplified_count)
 
     bg: BooleanGenerator = BooleanGenerator()
     s: Solver = Solver(passes)
