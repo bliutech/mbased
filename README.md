@@ -38,10 +38,10 @@ python3 run_experiment.py --help
 ```
 
 ## Contributing
-To contribute to this project, please open a pull request with your changes. If you are unsure about the changes you want to make, please open an issue to discuss it with one of the authors. For code health, please ensure that your code is clear and formatted. You can use the `black` code formatter to format your code. To install `black`, run `pip install black`. To format your code, run the following command.
+To contribute to this project, please open a pull request with your changes. If you are unsure about the changes you want to make, please open an issue to discuss it with one of the authors. For code health, please ensure that your code is clear and formatted. You can use the `ruff` code formatter to format your code. To install `ruff`, run `pip install ruff`. To format your code, run the following command.
 
 ```
-python -m black *.py */*.py
+ruff format *.py */*.py
 ```
 
 Formatting is checked using a GitHub action, so please ensure that your code is formatted before opening a pull request. We also try and follow good practices by adding type hints to our code.
