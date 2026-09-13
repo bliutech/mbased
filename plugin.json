@@ -1,6 +1,6 @@
 {
     "pluginmetadataversion": 2,
-    "name": "Mixed Boolean-Arithmetic (MBA) Deobfuscator",
+    "name": "MBASED: Mixed Boolean-Arithmetic (MBA) Deobfuscator",
     "type": [
         "helper"
     ],
@@ -30,7 +30,7 @@
             "typing_extensions"
         ]
     },
-    "version": "0.0.1",
+    "version": "1.0.0",
     "author": "Benson Liu",
     "minimumbinaryninjaversion": 0
 }
