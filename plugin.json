@@ -30,7 +30,7 @@
             "typing_extensions"
         ]
     },
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "Benson Liu",
     "minimumbinaryninjaversion": 0
 }
